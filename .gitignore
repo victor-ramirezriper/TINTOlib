@@ -1,17 +1,16 @@
-# Entornos virtuales
-venv/
-env/
-ENV/
+# Entorno virtual
+tinto_env/
 
-# Archivos de Python
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
 
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints
+# Jupyter
+.ipynb_checkpoints/
 
-# Archivos de sistema operativo
-.DS_Store
-Thumbs.db
+# VS Code
+.vscode/
+
+# Archivos temporales
+*.tmp
+*.log
