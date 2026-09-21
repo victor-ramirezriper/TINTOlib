@@ -1,5 +1,7 @@
 import os
 import time
+import json
+import random
 import pandas as pd
 import numpy as np
 import warnings
@@ -20,13 +22,22 @@ from src.project_config import IMAGE_DIR, RESULTS_DIR
 warnings.filterwarnings('ignore')
 
 # ============================================================
+# 0. CONFIGURACIÓN Y REPRODUCIBILIDAD
+# ============================================================
+def fijar_semillas(seed=42):
+    """Fija la semilla en todas las librerías para garantizar reproducibilidad exacta."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+# ============================================================
 # 1. DATASET PERSONALIZADO (CERO FUGA DE DATOS)
 # ============================================================
 class TintoDataset(Dataset):
-    """
-    Lee las imágenes generadas por TINTOlib y busca sus etiquetas en 'etiquetas.csv'.
-    Garantiza que el Target nunca formó parte de la transformación de la imagen.
-    """
     def __init__(self, folder_path, transform=None):
         self.folder_path = Path(folder_path)
         self.transform = transform
@@ -39,7 +50,9 @@ class TintoDataset(Dataset):
         self.labels = df_etiquetas.iloc[:, 0].values 
         
         extensiones = {".png", ".jpg", ".jpeg", ".bmp"}
-        archivos_img = [f for f in self.folder_path.iterdir() if f.suffix.lower() in extensiones]
+        
+        # CORRECCIÓN: Usamos rglob('*') para que busque dentro de las subcarpetas de clases (0, 1, etc.)
+        archivos_img = [f for f in self.folder_path.rglob('*') if f.suffix.lower() in extensiones]
         
         def extract_number(filepath):
             numeros = ''.join(filter(str.isdigit, filepath.stem))
@@ -65,17 +78,12 @@ class TintoDataset(Dataset):
         return image, torch.tensor(label, dtype=torch.long)
 
 def seleccionar_experimento_y_red():
-    """Menú de selección de lote, métodos y arquitectura de red neuronal."""
     carpeta_experimentos = Path(IMAGE_DIR) / "Experimentos"
     if not carpeta_experimentos.exists():
         print("No se encontró la carpeta de Experimentos.")
         exit()
 
     lotes = [d.name for d in carpeta_experimentos.iterdir() if d.is_dir()]
-    if not lotes:
-        print("No hay lotes generados.")
-        exit()
-
     print("="*60)
     print("SELECCIÓN DE DATOS Y RED NEURONAL")
     print("="*60)
@@ -86,7 +94,6 @@ def seleccionar_experimento_y_red():
     lote_seleccionado = lotes[opcion_lote]
     ruta_lote = carpeta_experimentos / lote_seleccionado
 
-    # Buscar métodos dentro del FOLD_1 para asegurar que la estructura por folds existe
     ruta_fold1 = ruta_lote / "FOLD_1" / "Imagenes"
     if not ruta_fold1.exists():
         print("Error: No se encontró la estructura de Folds dentro de este lote.")
@@ -101,10 +108,7 @@ def seleccionar_experimento_y_red():
     print("  99. TODOS LOS MÉTODOS")
 
     opcion_met = int(input("\nSelecciona el método (99 para todos): "))
-    if opcion_met == 99:
-        metodos_a_evaluar = metodos_generados
-    else:
-        metodos_a_evaluar = [metodos_generados[opcion_met - 1]]
+    metodos_a_evaluar = metodos_generados if opcion_met == 99 else [metodos_generados[opcion_met - 1]]
 
     redes_disponibles = ["ResNet18 (CNN)", "EfficientNet-B0 (CNN)", "ViT-Tiny (Transformer)"]
     print("\nArquitecturas de Redes:")
@@ -117,7 +121,6 @@ def seleccionar_experimento_y_red():
     return lote_seleccionado, metodos_a_evaluar, red_seleccionada, ruta_lote
 
 def inicializar_modelo(nombre_red, num_clases, device):
-    """Descarga y configura el modelo pre-entrenado seleccionado."""
     if "ResNet18" in nombre_red:
         modelo = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
         modelo.fc = nn.Linear(modelo.fc.in_features, num_clases)
@@ -126,26 +129,22 @@ def inicializar_modelo(nombre_red, num_clases, device):
         modelo.classifier[1] = nn.Linear(modelo.classifier[1].in_features, num_clases)
     elif "ViT-Tiny" in nombre_red:
         modelo = timm.create_model('vit_tiny_patch16_224', pretrained=True, num_classes=num_clases)
-    else:
-        raise ValueError("Arquitectura no reconocida")
-    
     return modelo.to(device)
 
-def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_splits=5, epochs=10):
-    """
-    Recorre directamente los Folds generados por el pipeline principal (main.py).
-    Entrena con TRAIN y evalúa estrictamente con TEST en cada fold correspondiente.
-    """
+def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_splits=5, epochs=10, batch_size=8, lr=0.001):
     transformaciones = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    device = torch.device("cpu") # Cambiar a "cuda" si usas GPU compatible
-    resultados_fold = {"accuracy": [], "f1": [], "roc_auc": [], "tiempo": []}
+    device = torch.device("cpu")
+    
+    # Contenedores de registro exhaustivo
+    registro_folds = []
+    registro_historial = []
 
-    print(f"\nIniciando Validación Cruzada ({n_splits} Folds) con {red_seleccionada} para el método {metodo}...")
+    print(f"\nIniciando Validación Cruzada ({n_splits} Folds) con {red_seleccionada} para {metodo}...")
 
     for fold in range(1, n_splits + 1):
         print(f"   Procesando Fold {fold}/{n_splits}...")
@@ -154,27 +153,28 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
         ruta_test = ruta_lote_base / f"FOLD_{fold}" / "Imagenes" / f"EXP_{metodo.upper()}_TEST"
 
         if not ruta_train.exists() or not ruta_test.exists():
-            print(f"   ⚠️ Advertencia: No se encontraron las carpetas para el Fold {fold}. Saltando...")
+            print(f"   Fold {fold} no encontrado. Saltando...")
             continue
 
-        # Cargamos datasets usando nuestras etiquetas seguras
         dataset_train = TintoDataset(ruta_train, transform=transformaciones)
         dataset_test = TintoDataset(ruta_test, transform=transformaciones)
 
         num_clases = len(np.unique(dataset_train.labels))
 
-        train_loader = DataLoader(dataset_train, batch_size=8, shuffle=True)
-        test_loader = DataLoader(dataset_test, batch_size=8, shuffle=False)
+        train_loader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True)
+        test_loader = DataLoader(dataset_test, batch_size=batch_size, shuffle=False)
 
         modelo = inicializar_modelo(red_seleccionada, num_clases, device)
         criterio = nn.CrossEntropyLoss()
-        optimizador = optim.Adam(modelo.parameters(), lr=0.001)
+        optimizador = optim.Adam(modelo.parameters(), lr=lr)
 
-        inicio_tiempo = time.perf_counter()
+        inicio_train = time.perf_counter()
 
-        # Entrenamiento por Épocas
+        # Entrenamiento por Épocas con registro de Loss
         for epoch in range(epochs):
             modelo.train()
+            train_loss_acum = 0.0
+            
             for inputs, labels in train_loader:
                 inputs, labels = inputs.to(device), labels.to(device)
                 optimizador.zero_grad()
@@ -182,10 +182,35 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
                 loss = criterio(outputs, labels)
                 loss.backward()
                 optimizador.step()
+                train_loss_acum += loss.item() * inputs.size(0)
 
-        tiempo_total = time.perf_counter() - inicio_tiempo
+            train_loss = train_loss_acum / len(dataset_train)
 
-        # Evaluación en el Test ciego de este Fold
+            # Calcular Validation Loss (sin entrenar)
+            modelo.eval()
+            val_loss_acum = 0.0
+            with torch.no_grad():
+                for inputs, labels in test_loader:
+                    inputs, labels = inputs.to(device), labels.to(device)
+                    outputs = modelo(inputs)
+                    loss = criterio(outputs, labels)
+                    val_loss_acum += loss.item() * inputs.size(0)
+            
+            val_loss = val_loss_acum / len(dataset_test)
+
+            # Registrar época
+            registro_historial.append({
+                "Metodo": metodo,
+                "Fold": fold,
+                "Epoch": epoch + 1,
+                "Train_Loss": round(train_loss, 4),
+                "Val_Loss": round(val_loss, 4)
+            })
+
+        tiempo_train_fold = time.perf_counter() - inicio_train
+
+        # Evaluación Final y Métricas
+        inicio_eval = time.perf_counter()
         modelo.eval()
         y_true, y_pred, y_proba = [], [], []
         
@@ -200,95 +225,143 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
                 y_pred.extend(preds.numpy())
                 y_proba.extend(probs.numpy())
 
-        y_true = np.array(y_true)
-        y_pred = np.array(y_pred)
-        y_proba = np.array(y_proba)
+        tiempo_eval_fold = time.perf_counter() - inicio_eval
 
-        acc = accuracy_score(y_true, y_pred)
-        f1 = f1_score(y_true, y_pred, average='macro')
+        y_true, y_pred, y_proba = np.array(y_true), np.array(y_pred), np.array(y_proba)
+
+        acc = accuracy_score(y_true, y_pred) * 100
+        f1 = f1_score(y_true, y_pred, average='macro') * 100
         
         try:
             if num_clases == 2:
-                roc = roc_auc_score(y_true, y_proba[:, 1])
+                roc = roc_auc_score(y_true, y_proba[:, 1]) * 100
             else:
-                roc = roc_auc_score(y_true, y_proba, multi_class='ovr', average='macro')
+                roc = roc_auc_score(y_true, y_proba, multi_class='ovr', average='macro') * 100
         except ValueError:
             roc = np.nan
 
-        resultados_fold["accuracy"].append(acc)
-        resultados_fold["f1"].append(f1)
-        resultados_fold["roc_auc"].append(roc)
-        resultados_fold["tiempo"].append(tiempo_total)
+        registro_folds.append({
+            "Metodo": metodo,
+            "Fold": fold,
+            "Accuracy": acc,
+            "F1_Score": f1,
+            "ROC_AUC": roc,
+            "Tiempo_Entrenamiento_s": tiempo_train_fold,
+            "Tiempo_Evaluacion_s": tiempo_eval_fold
+        })
 
-    if not resultados_fold["accuracy"]:
-        raise ValueError("No se pudieron procesar folds válidos para este método.")
+    if not registro_folds:
+        raise ValueError("No se procesaron folds válidos.")
 
-    # Promediar métricas de los folds
-    return {
-        "Accuracy": np.mean(resultados_fold["accuracy"]) * 100,
-        "F1_Score": np.mean(resultados_fold["f1"]) * 100,
-        "ROC_AUC": np.nanmean(resultados_fold["roc_auc"]) * 100,
-        "Tiempo_Promedio_Fold": np.mean(resultados_fold["tiempo"])
+    # Calcular Estadísticas Finales (Medias y Desviaciones Estándar)
+    df_folds = pd.DataFrame(registro_folds)
+    
+    resultados_agrupados = {
+        "Accuracy_Mean": df_folds["Accuracy"].mean(),
+        "Accuracy_Std": df_folds["Accuracy"].std(),
+        "F1_Score_Mean": df_folds["F1_Score"].mean(),
+        "F1_Score_Std": df_folds["F1_Score"].std(),
+        "ROC_AUC_Mean": df_folds["ROC_AUC"].mean(),
+        "ROC_AUC_Std": df_folds["ROC_AUC"].std(),
+        "Tiempo_Train_Mean": df_folds["Tiempo_Entrenamiento_s"].mean(),
+        "Tiempo_Eval_Mean": df_folds["Tiempo_Evaluacion_s"].mean()
     }
+    
+    return resultados_agrupados, registro_folds, registro_historial
 
-def guardar_resultados(lote, red_seleccionada, resultados_lista):
-    """Guarda los resultados en una subcarpeta específica del dataset."""
+def guardar_ecosistema_resultados(lote, red_seleccionada, metodos, df_resumen, lista_folds, lista_historial, parametros):
+    """Crea la estructura de carpetas estandarizada y guarda los 4 archivos de registro."""
     nombre_dataset = lote.split("_LOTE_")[0]
+    nombre_red_limpio = red_seleccionada.split(' ')[0]
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    carpeta_salida = RESULTS_DIR / nombre_dataset
-    carpeta_salida.mkdir(parents=True, exist_ok=True)
+    # Crear estructura: Results / Dataset / Arquitectura_Fecha
+    carpeta_base = RESULTS_DIR / nombre_dataset / f"{nombre_red_limpio}_{timestamp}"
+    carpeta_base.mkdir(parents=True, exist_ok=True)
     
-    nombre_archivo = f"{red_seleccionada.split(' ')[0]}_Results.csv"
-    ruta_archivo = carpeta_salida / nombre_archivo
-
-    df_nuevo = pd.DataFrame(resultados_lista)
-
-    if ruta_archivo.exists():
-        df_existente = pd.read_csv(ruta_archivo)
-        df_final = pd.concat([df_existente, df_nuevo], ignore_index=True)
-    else:
-        df_final = df_nuevo
-
-    df_final.to_csv(ruta_archivo, index=False)
-    print(f"\nResultados guardados en: {ruta_archivo}")
+    # 1. Guardar Resumen General
+    pd.DataFrame(df_resumen).to_csv(carpeta_base / "resultados_resumen.csv", index=False)
+    
+    # 2. Guardar Datos por Fold
+    pd.DataFrame(lista_folds).to_csv(carpeta_base / "resultados_folds.csv", index=False)
+    
+    # 3. Guardar Curvas de Aprendizaje (Historial Epochs)
+    pd.DataFrame(lista_historial).to_csv(carpeta_base / "historial_entrenamiento.csv", index=False)
+    
+    # 4. Guardar Configuración (Metadata del Experimento)
+    with open(carpeta_base / "experiment.json", "w") as json_file:
+        json.dump(parametros, json_file, indent=4)
+        
+    print(f"\nEcosistema de resultados guardado exitosamente en: {carpeta_base}")
 
 
 if __name__ == "__main__":
-    preparar_directorios = lambda: [RESULTS_DIR.mkdir(parents=True, exist_ok=True)]
-    preparar_directorios()
+    fijar_semillas(42)  # Garantiza resultados idénticos en múltiples ejecuciones
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     
     lote, metodos, red_seleccionada, ruta_lote = seleccionar_experimento_y_red()
     
-    resultados_totales = []
-    fecha_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # Parámetros globales del experimento a registrar
+    PARAMETROS_EXP = {
+        "dataset_lote": lote,
+        "red_neuronal": red_seleccionada,
+        "fecha_ejecucion": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "n_splits_kfold": 5,
+        "epochs": 10,
+        "batch_size": 8,
+        "learning_rate": 0.001,
+        "optimizer": "Adam",
+        "loss_function": "CrossEntropyLoss",
+        "seed": 42,
+        "metodos_evaluados": metodos
+    }
 
     print("\n" + "="*60)
     print(f"PROCESANDO LOTE: {lote}")
     print(f"ARQUITECTURA: {red_seleccionada}")
     print("="*60)
 
+    resumen_total = []
+    folds_totales = []
+    historial_total = []
+
     for metodo in metodos:
         print(f"\n--- Evaluando método: {metodo} ---")
         try:
-            metricas = entrenar_kfold_por_carpetas(ruta_lote, metodo, red_seleccionada, n_splits=5, epochs=10)
+            # Entrenamiento y recolección
+            res_agrupados, res_folds, res_historial = entrenar_kfold_por_carpetas(
+                ruta_lote, metodo, red_seleccionada, 
+                n_splits=PARAMETROS_EXP["n_splits_kfold"], 
+                epochs=PARAMETROS_EXP["epochs"],
+                batch_size=PARAMETROS_EXP["batch_size"],
+                lr=PARAMETROS_EXP["learning_rate"]
+            )
             
-            print(f"Resultados {metodo}: Acc={metricas['Accuracy']:.2f}% | F1={metricas['F1_Score']:.2f}% | ROC={metricas['ROC_AUC']:.2f}%")
+            # Acumuladores para guardado masivo
+            folds_totales.extend(res_folds)
+            historial_total.extend(res_historial)
             
-            resultados_totales.append({
-                "Dataset_Lote": lote,
+            # Formatear la fila del resumen con Media ± STD
+            fila_resumen = {
                 "Metodo_TINTO": metodo,
-                "Modelo_Red": red_seleccionada.split(' ')[0],
-                "Accuracy": round(metricas["Accuracy"], 2),
-                "F1_Score": round(metricas["F1_Score"], 2),
-                "ROC_AUC": round(metricas["ROC_AUC"], 2),
-                "Tiempo_Prom_Fold_s": round(metricas["Tiempo_Promedio_Fold"], 4),
-                "Fecha": fecha_actual
-            })
+                "Accuracy": f"{res_agrupados['Accuracy_Mean']:.2f} ± {res_agrupados['Accuracy_Std']:.2f}",
+                "F1_Score": f"{res_agrupados['F1_Score_Mean']:.2f} ± {res_agrupados['F1_Score_Std']:.2f}",
+                "ROC_AUC": f"{res_agrupados['ROC_AUC_Mean']:.2f} ± {res_agrupados['ROC_AUC_Std']:.2f}",
+                "Tiempo_Train_s": round(res_agrupados['Tiempo_Train_Mean'], 2),
+                "Tiempo_Eval_s": round(res_agrupados['Tiempo_Eval_Mean'], 2)
+            }
+            resumen_total.append(fila_resumen)
+            
+            print(f"Resultados {metodo}: Acc={fila_resumen['Accuracy']}% | F1={fila_resumen['F1_Score']}% | ROC={fila_resumen['ROC_AUC']}%")
             
         except Exception as e:
-            print(f" Error evaluando {metodo}: {e}")
+            print(f" Error crítico evaluando {metodo}: {e}")
 
-    if resultados_totales:
-        guardar_resultados(lote, red_seleccionada, resultados_totales)
+    # Guardar Ecosistema Completo si hubo éxito
+    if resumen_total:
+        guardar_ecosistema_resultados(
+            lote, red_seleccionada, metodos, 
+            resumen_total, folds_totales, historial_total, PARAMETROS_EXP
+        )
     
     print("\nPROCESO FINALIZADO.")

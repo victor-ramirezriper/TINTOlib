@@ -88,11 +88,11 @@ if __name__ == "__main__":
     
     estrategias = ["Original"]
     if ratio > 2.0:
-        print(f"\n⚠️ ADVERTENCIA: Alto desbalanceo detectado (Ratio {ratio:.2f}).")
-        print("⚙️ MODO AUTOMÁTICO: Se generarán dos lotes de imágenes (ORIGINAL y SMOTE).")
+        print(f"\nADVERTENCIA: Alto desbalanceo detectado (Ratio {ratio:.2f}).")
+        print("MODO AUTOMÁTICO: Se generarán dos lotes de imágenes (ORIGINAL y SMOTE).")
         estrategias.append("SMOTE")
     else:
-        print(f"\n✅ Dataset balanceado (Ratio {ratio:.2f}). Solo se generará el lote ORIGINAL.")
+        print(f"\nDataset balanceado (Ratio {ratio:.2f}). Solo se generará el lote ORIGINAL.")
 
     N_FOLDS = 5
     skf = StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=42)
@@ -114,9 +114,9 @@ if __name__ == "__main__":
 
         # BUCLE DE FOLDS
         for fold, (train_idx, test_idx) in enumerate(skf.split(X, y), 1):
-            print("\n" + "★" * 60)
-            print(f"★ FOLD {fold} DE {N_FOLDS} | ESTRATEGIA: {estrategia.upper()}")
-            print("★" * 60)
+            print("\n" + "" * 60)
+            print(f" FOLD {fold} DE {N_FOLDS} | ESTRATEGIA: {estrategia.upper()}")
+            print("" * 60)
             
             # 1. DIVISIÓN DEL PLIEGUE ACTUAL
             X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
@@ -210,7 +210,7 @@ if __name__ == "__main__":
                     )
                     
                 except Exception as e:
-                    print(f"\n❌ Error crítico al ejecutar {metodo.upper()} en Fold {fold}: {e}")
+                    print(f"\nError crítico al ejecutar {metodo.upper()} en Fold {fold}: {e}")
                     print("Saltando al siguiente método...\n")
 
     print("\n" + "=" * 60)

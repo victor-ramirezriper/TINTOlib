@@ -62,6 +62,9 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
     clase_minoritaria = conteo_clases.min()
     ratio = clase_mayoritaria / clase_minoritaria if clase_minoritaria > 0 else float('inf')
     
+    # INICIALIZAR CONTENEDOR ANTES DE COMENZAR
+    filas_csv = []
+    
     # 2. DECISIÓN DE ESTRATEGIAS
     estrategias = ["Original"]
     if ratio > 2.0:
@@ -89,6 +92,7 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
         
         print(f"Procesando 5-Fold Cross Validation ({estrategia})...")
         
+        fold_idx = 1
         for train_index, test_index in skf.split(X, y):
             X_train_fold, X_test_fold = X.iloc[train_index], X.iloc[test_index]
             y_train_fold, y_test_fold = y.iloc[train_index], y.iloc[test_index]
@@ -133,55 +137,57 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
                 resultados[nombre]["roc_auc"].append(roc)
                 resultados[nombre]["tiempo"].append(tiempo_total)
 
-        # REPORTE Y GUARDADO POR ESTRATEGIA
+                # REPORTE Y GUARDADO POR ESTRATEGIA (Indentación corregida aquí)
+                filas_csv.append({
+                    "Dataset": nombre_dataset,
+                    "Estrategia": estrategia,
+                    "Modelo": nombre,
+                    "Total_Folds": 5,
+                    "Fold_Actual": f"Fold_{fold_idx}", 
+                    "Accuracy": round(acc, 4),
+                    "F1_Score": round(f1, 4),
+                    "ROC_AUC": round(roc, 4) if not np.isnan(roc) else "N/A",
+                    "Tiempo_s": round(tiempo_total, 4),
+                    "Fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                })
+            fold_idx += 1
+
+        # REPORTE PROMEDIADO EN CONSOLA Y GUARDADO DE CSV
+        print("\n" + "-"*75)
+        print(f"RESULTADOS FINALES PROMEDIADOS ({estrategia})")
+        print("-" * 75)
+        print(f"{'Modelo':<15} | {'Accuracy':<10} | {'F1-Score':<10} | {'ROC-AUC':<10} | {'Tiempo (s)'}")
+        print("-" * 75)
+        
+        for nombre in modelos:
+            acc_mean = np.mean(resultados[nombre]['accuracy'])
+            f1_mean = np.mean(resultados[nombre]['f1'])
+            roc_mean = np.nanmean(resultados[nombre]['roc_auc'])
+            tiempo_mean = np.mean(resultados[nombre]['tiempo'])
+            
+            print(f"{nombre:<15} | {acc_mean*100:>5.2f}%    | {f1_mean*100:>5.2f}%    | {roc_mean*100:>5.2f}%    | {tiempo_mean:.4f}s")
+            
+            # Guardamos también la fila del PROMEDIO FINAL
             filas_csv.append({
                 "Dataset": nombre_dataset,
                 "Estrategia": estrategia,
                 "Modelo": nombre,
                 "Total_Folds": 5,
-                "Fold_Actual": f"Fold_{train_index[0] % 5 + 1}", # Simulación de ID de fold
-                "Accuracy": round(acc, 4),
-                "F1_Score": round(f1, 4),
-                "ROC_AUC": round(roc, 4) if not np.isnan(roc) else "N/A",
-                "Tiempo_s": round(tiempo_total, 4),
+                "Fold_Actual": "PROMEDIO",
+                "Accuracy": round(acc_mean, 4),
+                "F1_Score": round(f1_mean, 4),
+                "ROC_AUC": round(roc_mean, 4) if not np.isnan(roc_mean) else "N/A",
+                "Tiempo_s": round(tiempo_mean, 4),
                 "Fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })
 
-    # REPORTE PROMEDIADO EN CONSOLA Y GUARDADO DE CSV
-    print("\n" + "-"*75)
-    print(f"RESULTADOS FINALES PROMEDIADOS ({estrategia})")
-    print("-" * 75)
-    print(f"{'Modelo':<15} | {'Accuracy':<10} | {'F1-Score':<10} | {'ROC-AUC':<10} | {'Tiempo (s)'}")
-    print("-" * 75)
-    
-    for nombre in modelos:
-        acc_mean = np.mean(resultados[nombre]['accuracy'])
-        f1_mean = np.mean(resultados[nombre]['f1'])
-        roc_mean = np.nanmean(resultados[nombre]['roc_auc'])
-        tiempo_mean = np.mean(resultados[nombre]['tiempo'])
-        
-        print(f"{nombre:<15} | {acc_mean*100:>5.2f}%    | {f1_mean*100:>5.2f}%    | {roc_mean*100:>5.2f}%    | {tiempo_mean:.4f}s")
-        
-        # Guardamos también la fila del PROMEDIO FINAL
-        filas_csv.append({
-            "Dataset": nombre_dataset,
-            "Estrategia": estrategia,
-            "Modelo": nombre,
-            "Total_Folds": 5,
-            "Fold_Actual": "PROMEDIO",
-            "Accuracy": round(acc_mean, 4),
-            "F1_Score": round(f1_mean, 4),
-            "ROC_AUC": round(roc_mean, 4) if not np.isnan(roc_mean) else "N/A",
-            "Tiempo_s": round(tiempo_mean, 4),
-            "Fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        })
-
+    # Guardado fuera de los bucles para consolidar todo
     df_resultados = pd.DataFrame(filas_csv)
     nombre_base = nombre_dataset.replace('.csv', '')
-    ruta_salida = RESULTS_DIR / f"Baseline_{nombre_base}_{estrategia}.csv"
+    ruta_salida = RESULTS_DIR / f"Baseline_{nombre_base}_COMPLETO.csv"
     
     df_resultados.to_csv(ruta_salida, index=False)
-
+    print(f"\nResultados guardados exitosamente en: {ruta_salida}")
 
 if __name__ == "__main__":
     preparar_directorios()

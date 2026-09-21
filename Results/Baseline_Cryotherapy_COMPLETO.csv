@@ -1,0 +1,19 @@
+Dataset,Estrategia,Modelo,Total_Folds,Fold_Actual,Accuracy,F1_Score,ROC_AUC,Tiempo_s,Fecha
+Cryotherapy.csv,Original,Random_Forest,5,Fold_1,1.0,1.0,1.0,0.2179,2026-09-21 10:04:11
+Cryotherapy.csv,Original,SVM,5,Fold_1,0.7778,0.7778,0.9506,0.0148,2026-09-21 10:04:11
+Cryotherapy.csv,Original,MLP_Clasico,5,Fold_1,0.9444,0.9443,0.9753,0.5441,2026-09-21 10:04:11
+Cryotherapy.csv,Original,Random_Forest,5,Fold_2,0.8889,0.8875,0.9506,0.187,2026-09-21 10:04:12
+Cryotherapy.csv,Original,SVM,5,Fold_2,0.8889,0.8875,1.0,0.0042,2026-09-21 10:04:12
+Cryotherapy.csv,Original,MLP_Clasico,5,Fold_2,0.8333,0.8328,0.9506,0.411,2026-09-21 10:04:12
+Cryotherapy.csv,Original,Random_Forest,5,Fold_3,0.8889,0.8875,0.95,0.1581,2026-09-21 10:04:12
+Cryotherapy.csv,Original,SVM,5,Fold_3,0.8889,0.8875,0.85,0.0048,2026-09-21 10:04:12
+Cryotherapy.csv,Original,MLP_Clasico,5,Fold_3,0.8889,0.8875,0.9,0.3875,2026-09-21 10:04:13
+Cryotherapy.csv,Original,Random_Forest,5,Fold_4,0.9444,0.9429,1.0,0.1625,2026-09-21 10:04:13
+Cryotherapy.csv,Original,SVM,5,Fold_4,0.9444,0.9429,1.0,0.0051,2026-09-21 10:04:13
+Cryotherapy.csv,Original,MLP_Clasico,5,Fold_4,0.9444,0.9429,1.0,0.4408,2026-09-21 10:04:13
+Cryotherapy.csv,Original,Random_Forest,5,Fold_5,0.8889,0.8889,0.925,0.1771,2026-09-21 10:04:13
+Cryotherapy.csv,Original,SVM,5,Fold_5,0.8333,0.8328,1.0,0.0046,2026-09-21 10:04:13
+Cryotherapy.csv,Original,MLP_Clasico,5,Fold_5,0.8333,0.8328,1.0,0.4062,2026-09-21 10:04:14
+Cryotherapy.csv,Original,Random_Forest,5,PROMEDIO,0.9222,0.9213,0.9651,0.1805,2026-09-21 10:04:14
+Cryotherapy.csv,Original,SVM,5,PROMEDIO,0.8667,0.8657,0.9601,0.0067,2026-09-21 10:04:14
+Cryotherapy.csv,Original,MLP_Clasico,5,PROMEDIO,0.8889,0.8881,0.9652,0.4379,2026-09-21 10:04:14
