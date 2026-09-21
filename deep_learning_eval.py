@@ -8,6 +8,9 @@ import warnings
 from pathlib import Path
 from datetime import datetime
 
+# NUEVO IMPORT: Para registrar el hardware
+import psutil 
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -138,13 +141,15 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    device = torch.device("cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    # Contenedores de registro exhaustivo
     registro_folds = []
     registro_historial = []
 
-    print(f"\nIniciando Validación Cruzada ({n_splits} Folds) con {red_seleccionada} para {metodo}...")
+    print(f"\nIniciando Validación Cruzada ({n_splits} Folds) con {red_seleccionada} para {metodo} en {device.type.upper()}...")
+
+    # Inicializar proceso para medir hardware
+    proceso = psutil.Process(os.getpid())
 
     for fold in range(1, n_splits + 1):
         print(f"   Procesando Fold {fold}/{n_splits}...")
@@ -169,6 +174,12 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
         optimizador = optim.Adam(modelo.parameters(), lr=lr)
 
         inicio_train = time.perf_counter()
+        
+        # Variables de rastreo de hardware
+        max_ram_fold = 0
+        cpu_percents = []
+        if device.type == 'cuda':
+            torch.cuda.reset_peak_memory_stats(device)
 
         # Entrenamiento por Épocas con registro de Loss
         for epoch in range(epochs):
@@ -183,6 +194,11 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
                 loss.backward()
                 optimizador.step()
                 train_loss_acum += loss.item() * inputs.size(0)
+                
+                # Registrar Hardware por batch
+                meminfo = proceso.memory_info()
+                max_ram_fold = max(max_ram_fold, meminfo.rss / (1024 ** 3)) # En GB
+                cpu_percents.append(proceso.cpu_percent(interval=None))
 
             train_loss = train_loss_acum / len(dataset_train)
 
@@ -198,7 +214,6 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
             
             val_loss = val_loss_acum / len(dataset_test)
 
-            # Registrar época
             registro_historial.append({
                 "Metodo": metodo,
                 "Fold": fold,
@@ -208,6 +223,10 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
             })
 
         tiempo_train_fold = time.perf_counter() - inicio_train
+
+        # Consolidar lecturas de hardware
+        avg_cpu_fold = sum(cpu_percents) / len(cpu_percents) if cpu_percents else 0
+        max_vram_fold = torch.cuda.max_memory_allocated(device) / (1024 ** 3) if device.type == 'cuda' else 0
 
         # Evaluación Final y Métricas
         inicio_eval = time.perf_counter()
@@ -247,7 +266,10 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
             "F1_Score": f1,
             "ROC_AUC": roc,
             "Tiempo_Entrenamiento_s": tiempo_train_fold,
-            "Tiempo_Evaluacion_s": tiempo_eval_fold
+            "Tiempo_Evaluacion_s": tiempo_eval_fold,
+            "Max_RAM_GB": max_ram_fold,
+            "Avg_CPU_Percent": avg_cpu_fold,
+            "Max_VRAM_GB": max_vram_fold
         })
 
     if not registro_folds:
@@ -264,31 +286,26 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
         "ROC_AUC_Mean": df_folds["ROC_AUC"].mean(),
         "ROC_AUC_Std": df_folds["ROC_AUC"].std(),
         "Tiempo_Train_Mean": df_folds["Tiempo_Entrenamiento_s"].mean(),
-        "Tiempo_Eval_Mean": df_folds["Tiempo_Evaluacion_s"].mean()
+        "Tiempo_Eval_Mean": df_folds["Tiempo_Evaluacion_s"].mean(),
+        "Max_RAM_Mean": df_folds["Max_RAM_GB"].mean(),
+        "Avg_CPU_Mean": df_folds["Avg_CPU_Percent"].mean(),
+        "Max_VRAM_Mean": df_folds["Max_VRAM_GB"].mean()
     }
     
     return resultados_agrupados, registro_folds, registro_historial
 
 def guardar_ecosistema_resultados(lote, red_seleccionada, metodos, df_resumen, lista_folds, lista_historial, parametros):
-    """Crea la estructura de carpetas estandarizada y guarda los 4 archivos de registro."""
     nombre_dataset = lote.split("_LOTE_")[0]
     nombre_red_limpio = red_seleccionada.split(' ')[0]
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # Crear estructura: Results / Dataset / Arquitectura_Fecha
     carpeta_base = RESULTS_DIR / nombre_dataset / f"{nombre_red_limpio}_{timestamp}"
     carpeta_base.mkdir(parents=True, exist_ok=True)
     
-    # 1. Guardar Resumen General
     pd.DataFrame(df_resumen).to_csv(carpeta_base / "resultados_resumen.csv", index=False)
-    
-    # 2. Guardar Datos por Fold
     pd.DataFrame(lista_folds).to_csv(carpeta_base / "resultados_folds.csv", index=False)
-    
-    # 3. Guardar Curvas de Aprendizaje (Historial Epochs)
     pd.DataFrame(lista_historial).to_csv(carpeta_base / "historial_entrenamiento.csv", index=False)
     
-    # 4. Guardar Configuración (Metadata del Experimento)
     with open(carpeta_base / "experiment.json", "w") as json_file:
         json.dump(parametros, json_file, indent=4)
         
@@ -296,15 +313,15 @@ def guardar_ecosistema_resultados(lote, red_seleccionada, metodos, df_resumen, l
 
 
 if __name__ == "__main__":
-    fijar_semillas(42)  # Garantiza resultados idénticos en múltiples ejecuciones
+    fijar_semillas(42)  
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     
     lote, metodos, red_seleccionada, ruta_lote = seleccionar_experimento_y_red()
     
-    # Parámetros globales del experimento a registrar
     PARAMETROS_EXP = {
         "dataset_lote": lote,
         "red_neuronal": red_seleccionada,
+        "hardware_utilizado": "GPU (CUDA)" if torch.cuda.is_available() else "CPU",
         "fecha_ejecucion": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "n_splits_kfold": 5,
         "epochs": 10,
@@ -319,6 +336,7 @@ if __name__ == "__main__":
     print("\n" + "="*60)
     print(f"PROCESANDO LOTE: {lote}")
     print(f"ARQUITECTURA: {red_seleccionada}")
+    print(f"HARDWARE: {PARAMETROS_EXP['hardware_utilizado']}")
     print("="*60)
 
     resumen_total = []
@@ -328,7 +346,6 @@ if __name__ == "__main__":
     for metodo in metodos:
         print(f"\n--- Evaluando método: {metodo} ---")
         try:
-            # Entrenamiento y recolección
             res_agrupados, res_folds, res_historial = entrenar_kfold_por_carpetas(
                 ruta_lote, metodo, red_seleccionada, 
                 n_splits=PARAMETROS_EXP["n_splits_kfold"], 
@@ -337,27 +354,27 @@ if __name__ == "__main__":
                 lr=PARAMETROS_EXP["learning_rate"]
             )
             
-            # Acumuladores para guardado masivo
             folds_totales.extend(res_folds)
             historial_total.extend(res_historial)
             
-            # Formatear la fila del resumen con Media ± STD
             fila_resumen = {
                 "Metodo_TINTO": metodo,
                 "Accuracy": f"{res_agrupados['Accuracy_Mean']:.2f} ± {res_agrupados['Accuracy_Std']:.2f}",
                 "F1_Score": f"{res_agrupados['F1_Score_Mean']:.2f} ± {res_agrupados['F1_Score_Std']:.2f}",
                 "ROC_AUC": f"{res_agrupados['ROC_AUC_Mean']:.2f} ± {res_agrupados['ROC_AUC_Std']:.2f}",
                 "Tiempo_Train_s": round(res_agrupados['Tiempo_Train_Mean'], 2),
-                "Tiempo_Eval_s": round(res_agrupados['Tiempo_Eval_Mean'], 2)
+                "Tiempo_Eval_s": round(res_agrupados['Tiempo_Eval_Mean'], 2),
+                "RAM_GB": round(res_agrupados['Max_RAM_Mean'], 2),
+                "CPU_Usage_%": round(res_agrupados['Avg_CPU_Mean'], 2),
+                "VRAM_GB": round(res_agrupados['Max_VRAM_Mean'], 2)
             }
             resumen_total.append(fila_resumen)
             
-            print(f"Resultados {metodo}: Acc={fila_resumen['Accuracy']}% | F1={fila_resumen['F1_Score']}% | ROC={fila_resumen['ROC_AUC']}%")
+            print(f"Resultados {metodo}: Acc={fila_resumen['Accuracy']}% | F1={fila_resumen['F1_Score']}% | ROC={fila_resumen['ROC_AUC']}% | RAM={fila_resumen['RAM_GB']}GB")
             
         except Exception as e:
             print(f" Error crítico evaluando {metodo}: {e}")
 
-    # Guardar Ecosistema Completo si hubo éxito
     if resumen_total:
         guardar_ecosistema_resultados(
             lote, red_seleccionada, metodos, 
