@@ -8,7 +8,7 @@ import warnings
 from pathlib import Path
 from datetime import datetime
 
-# NUEVO IMPORT: Para registrar el hardware
+# Monitoreo de hardware
 import psutil 
 
 import torch
@@ -17,6 +17,7 @@ import torch.optim as optim
 from torchvision import models, transforms
 from torch.utils.data import Dataset, DataLoader
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
+from sklearn.utils.class_weight import compute_class_weight
 from tqdm import tqdm
 import timm
 
@@ -54,7 +55,6 @@ class TintoDataset(Dataset):
         
         extensiones = {".png", ".jpg", ".jpeg", ".bmp"}
         
-        # CORRECCIÓN: Usamos rglob('*') para que busque dentro de las subcarpetas de clases (0, 1, etc.)
         archivos_img = [f for f in self.folder_path.rglob('*') if f.suffix.lower() in extensiones]
         
         def extract_number(filepath):
@@ -148,7 +148,6 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
 
     print(f"\nIniciando Validación Cruzada ({n_splits} Folds) con {red_seleccionada} para {metodo} en {device.type.upper()}...")
 
-    # Inicializar proceso para medir hardware
     proceso = psutil.Process(os.getpid())
 
     for fold in range(1, n_splits + 1):
@@ -170,18 +169,24 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
         test_loader = DataLoader(dataset_test, batch_size=batch_size, shuffle=False)
 
         modelo = inicializar_modelo(red_seleccionada, num_clases, device)
-        criterio = nn.CrossEntropyLoss()
+        
+        # ========================================================
+        # CÁLCULO DE PESOS DE CLASE (Mitigación justa de desbalanceo)
+        # ========================================================
+        clases_unicas = np.unique(dataset_train.labels)
+        pesos_clase = compute_class_weight('balanced', classes=clases_unicas, y=dataset_train.labels)
+        pesos_tensor = torch.tensor(pesos_clase, dtype=torch.float).to(device)
+        
+        criterio = nn.CrossEntropyLoss(weight=pesos_tensor)
         optimizador = optim.Adam(modelo.parameters(), lr=lr)
 
         inicio_train = time.perf_counter()
         
-        # Variables de rastreo de hardware
         max_ram_fold = 0
         cpu_percents = []
         if device.type == 'cuda':
             torch.cuda.reset_peak_memory_stats(device)
 
-        # Entrenamiento por Épocas con registro de Loss
         for epoch in range(epochs):
             modelo.train()
             train_loss_acum = 0.0
@@ -195,14 +200,12 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
                 optimizador.step()
                 train_loss_acum += loss.item() * inputs.size(0)
                 
-                # Registrar Hardware por batch
                 meminfo = proceso.memory_info()
-                max_ram_fold = max(max_ram_fold, meminfo.rss / (1024 ** 3)) # En GB
+                max_ram_fold = max(max_ram_fold, meminfo.rss / (1024 ** 3))
                 cpu_percents.append(proceso.cpu_percent(interval=None))
 
             train_loss = train_loss_acum / len(dataset_train)
 
-            # Calcular Validation Loss (sin entrenar)
             modelo.eval()
             val_loss_acum = 0.0
             with torch.no_grad():
@@ -224,11 +227,9 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
 
         tiempo_train_fold = time.perf_counter() - inicio_train
 
-        # Consolidar lecturas de hardware
         avg_cpu_fold = sum(cpu_percents) / len(cpu_percents) if cpu_percents else 0
         max_vram_fold = torch.cuda.max_memory_allocated(device) / (1024 ** 3) if device.type == 'cuda' else 0
 
-        # Evaluación Final y Métricas
         inicio_eval = time.perf_counter()
         modelo.eval()
         y_true, y_pred, y_proba = [], [], []
@@ -275,7 +276,6 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
     if not registro_folds:
         raise ValueError("No se procesaron folds válidos.")
 
-    # Calcular Estadísticas Finales (Medias y Desviaciones Estándar)
     df_folds = pd.DataFrame(registro_folds)
     
     resultados_agrupados = {
@@ -322,13 +322,14 @@ if __name__ == "__main__":
         "dataset_lote": lote,
         "red_neuronal": red_seleccionada,
         "hardware_utilizado": "GPU (CUDA)" if torch.cuda.is_available() else "CPU",
+        "estrategia_desbalanceo": "Class_Weights (Balanced)",
         "fecha_ejecucion": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "n_splits_kfold": 5,
         "epochs": 10,
         "batch_size": 8,
         "learning_rate": 0.001,
         "optimizer": "Adam",
-        "loss_function": "CrossEntropyLoss",
+        "loss_function": "CrossEntropyLoss (Weighted)",
         "seed": 42,
         "metodos_evaluados": metodos
     }
@@ -337,6 +338,7 @@ if __name__ == "__main__":
     print(f"PROCESANDO LOTE: {lote}")
     print(f"ARQUITECTURA: {red_seleccionada}")
     print(f"HARDWARE: {PARAMETROS_EXP['hardware_utilizado']}")
+    print(f"ESTRATEGIA DESBALANCEO: {PARAMETROS_EXP['estrategia_desbalanceo']}")
     print("="*60)
 
     resumen_total = []
