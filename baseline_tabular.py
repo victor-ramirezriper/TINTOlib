@@ -5,13 +5,15 @@ import numpy as np
 import warnings
 from datetime import datetime
 
+# NUEVO IMPORT: Para registrar el hardware
+import psutil 
+
 from sklearn.model_selection import StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 
-# NUEVO IMPORT: SMOTE para generar muestras sintéticas
 from imblearn.over_sampling import SMOTE 
 
 from src.project_config import obtener_ruta_dataset, preparar_directorios, DATA_DIR, RESULTS_DIR
@@ -56,16 +58,16 @@ def menu_interactivo():
     return nombre_archivo, ruta_dataset, target_col
 
 def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nombre_dataset):
-    # 1. ANÁLISIS AUTOMÁTICO DE DESBALANCEO
     conteo_clases = y.value_counts()
     clase_mayoritaria = conteo_clases.max()
     clase_minoritaria = conteo_clases.min()
     ratio = clase_mayoritaria / clase_minoritaria if clase_minoritaria > 0 else float('inf')
     
-    # INICIALIZAR CONTENEDOR ANTES DE COMENZAR
     filas_csv = []
     
-    # 2. DECISIÓN DE ESTRATEGIAS
+    # Inicializar el monitor de procesos de hardware
+    proceso = psutil.Process(os.getpid())
+    
     estrategias = ["Original"]
     if ratio > 2.0:
         print(f"\nADVERTENCIA: Alto desbalanceo detectado (Ratio {ratio:.2f}).")
@@ -74,11 +76,10 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
     else:
         print(f"\nDataset balanceado (Ratio {ratio:.2f}). Solo se ejecutará la versión Original.")
 
-    # 3. BUCLE DE EXPERIMENTACIÓN (Corre 1 o 2 veces según la necesidad)
     for estrategia in estrategias:
-        print(f"\n" + "="*75)
+        print(f"\n" + "="*85)
         print(f"INICIANDO EVALUACIÓN: ESTRATEGIA {estrategia.upper()}")
-        print("="*75)
+        print("="*85)
         
         skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         
@@ -88,7 +89,8 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
             "MLP_Clasico": MLPClassifier(random_state=42, max_iter=1000)
         }
         
-        resultados = {nombre: {"accuracy": [], "f1": [], "roc_auc": [], "tiempo": []} for nombre in modelos}
+        # Agregamos contenedores para RAM y CPU
+        resultados = {nombre: {"accuracy": [], "f1": [], "roc_auc": [], "tiempo": [], "ram": [], "cpu": []} for nombre in modelos}
         
         print(f"Procesando 5-Fold Cross Validation ({estrategia})...")
         
@@ -102,23 +104,35 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
             X_train_enc, X_test_enc, _, _ = aplicar_encoding_seguro(X_train_fold, X_test_fold, columnas_categoricas)
             X_train_scaled, X_test_scaled, _ = aplicar_escalado_seguro(X_train_enc, X_test_enc, columnas_numericas)
             
-            # NUEVO: Aplicación dinámica de SMOTE solo en el set de entrenamiento si toca esta estrategia
+            # Aplicación dinámica y segura de SMOTE
             if estrategia == "SMOTE":
-                smote = SMOTE(random_state=42)
-                X_train_final, y_train_final = smote.fit_resample(X_train_scaled, y_train_fold_enc)
+                min_muestras = pd.Series(y_train_fold_enc).value_counts().min()
+                if min_muestras > 1:
+                    vecinos_k = min(5, min_muestras - 1)
+                    smote = SMOTE(random_state=42, k_neighbors=vecinos_k)
+                    X_train_final, y_train_final = smote.fit_resample(X_train_scaled, y_train_fold_enc)
+                else:
+                    X_train_final, y_train_final = X_train_scaled, y_train_fold_enc
             else:
                 X_train_final, y_train_final = X_train_scaled, y_train_fold_enc
             
             for nombre, modelo in modelos.items():
+                
+                # Preparamos el monitor de CPU (lo ponemos en ceros para este bloque)
+                proceso.cpu_percent(interval=None) 
+                
                 inicio = time.perf_counter()
                 
-                # Entrenamos con el X_train_final (que puede estar balanceado o no)
+                # Entrenamos y evaluamos
                 modelo.fit(X_train_final, y_train_final)
-                # Evaluamos SIEMPRE con el X_test original (regla de oro del Machine Learning)
                 y_pred = modelo.predict(X_test_scaled)
                 y_proba = modelo.predict_proba(X_test_scaled)
                 
                 tiempo_total = time.perf_counter() - inicio
+                
+                # Capturamos el consumo exacto al terminar el modelo
+                cpu_usage = proceso.cpu_percent(interval=None)
+                ram_usage = proceso.memory_info().rss / (1024 ** 3) # Convertimos a Gigabytes
                 
                 acc = accuracy_score(y_test_fold_enc, y_pred)
                 f1 = f1_score(y_test_fold_enc, y_pred, average='macro')
@@ -136,8 +150,10 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
                 resultados[nombre]["f1"].append(f1)
                 resultados[nombre]["roc_auc"].append(roc)
                 resultados[nombre]["tiempo"].append(tiempo_total)
+                resultados[nombre]["ram"].append(ram_usage)
+                resultados[nombre]["cpu"].append(cpu_usage)
 
-                # REPORTE Y GUARDADO POR ESTRATEGIA (Indentación corregida aquí)
+                # REPORTE Y GUARDADO POR ESTRATEGIA (Fold Individual)
                 filas_csv.append({
                     "Dataset": nombre_dataset,
                     "Estrategia": estrategia,
@@ -148,24 +164,28 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
                     "F1_Score": round(f1, 4),
                     "ROC_AUC": round(roc, 4) if not np.isnan(roc) else "N/A",
                     "Tiempo_s": round(tiempo_total, 4),
+                    "RAM_GB": round(ram_usage, 4),
+                    "CPU_Usage_%": round(cpu_usage, 2),
                     "Fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 })
             fold_idx += 1
 
         # REPORTE PROMEDIADO EN CONSOLA Y GUARDADO DE CSV
-        print("\n" + "-"*75)
+        print("\n" + "-"*85)
         print(f"RESULTADOS FINALES PROMEDIADOS ({estrategia})")
-        print("-" * 75)
-        print(f"{'Modelo':<15} | {'Accuracy':<10} | {'F1-Score':<10} | {'ROC-AUC':<10} | {'Tiempo (s)'}")
-        print("-" * 75)
+        print("-" * 85)
+        print(f"{'Modelo':<15} | {'Accuracy':<8} | {'F1-Score':<8} | {'ROC-AUC':<8} | {'Tiempo':<8} | {'RAM (GB)':<8} | {'CPU (%)'}")
+        print("-" * 85)
         
         for nombre in modelos:
             acc_mean = np.mean(resultados[nombre]['accuracy'])
             f1_mean = np.mean(resultados[nombre]['f1'])
             roc_mean = np.nanmean(resultados[nombre]['roc_auc'])
             tiempo_mean = np.mean(resultados[nombre]['tiempo'])
+            ram_mean = np.mean(resultados[nombre]['ram'])
+            cpu_mean = np.mean(resultados[nombre]['cpu'])
             
-            print(f"{nombre:<15} | {acc_mean*100:>5.2f}%    | {f1_mean*100:>5.2f}%    | {roc_mean*100:>5.2f}%    | {tiempo_mean:.4f}s")
+            print(f"{nombre:<15} | {acc_mean*100:>5.2f}%   | {f1_mean*100:>5.2f}%   | {roc_mean*100:>5.2f}%   | {tiempo_mean:.4f}s | {ram_mean:>6.4f}GB | {cpu_mean:>5.2f}%")
             
             # Guardamos también la fila del PROMEDIO FINAL
             filas_csv.append({
@@ -178,6 +198,8 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
                 "F1_Score": round(f1_mean, 4),
                 "ROC_AUC": round(roc_mean, 4) if not np.isnan(roc_mean) else "N/A",
                 "Tiempo_s": round(tiempo_mean, 4),
+                "RAM_GB": round(ram_mean, 4),
+                "CPU_Usage_%": round(cpu_mean, 2),
                 "Fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })
 
