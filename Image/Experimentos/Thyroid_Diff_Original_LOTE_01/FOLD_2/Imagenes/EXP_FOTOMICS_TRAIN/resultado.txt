@@ -1,0 +1,382 @@
+======================================================================
+REGISTRO DE EXPERIMENTO
+======================================================================
+
+IDENTIFICACIÓN
+----------------------------------------------------------------------
+Lote/Experimento: Thyroid_Diff_Original_LOTE_01_FOLD_2
+Método: EXP_FOTOMICS_TRAIN
+Estado: COMPLETADO
+Fecha de inicio: 2026-09-21 20:56:54
+Fecha de finalización: 2026-09-21 20:56:55
+Tiempo de transformación: 0.225274 segundos
+Tiempo de verificación: 0.042632 segundos
+Tiempo total del experimento: 0.268019 segundos
+
+DATASET
+----------------------------------------------------------------------
+nombre_dataset: Thyroid_Diff_Original_FOLD2_TRAIN
+muestras: 306
+columnas_totales: 56
+columnas_numericas: ['Age', 'Gender_F', 'Gender_M', 'Smoking_No', 'Smoking_Yes', 'Hx Smoking_No', 'Hx Smoking_Yes', 'Hx Radiothreapy_No', 'Hx Radiothreapy_Yes', 'Thyroid Function_Clinical Hyperthyroidism', 'Thyroid Function_Clinical Hypothyroidism', 'Thyroid Function_Euthyroid', 'Thyroid Function_Subclinical Hyperthyroidism', 'Thyroid Function_Subclinical Hypothyroidism', 'Physical Examination_Diffuse goiter', 'Physical Examination_Multinodular goiter', 'Physical Examination_Normal', 'Physical Examination_Single nodular goiter-left', 'Physical Examination_Single nodular goiter-right', 'Adenopathy_Bilateral', 'Adenopathy_Extensive', 'Adenopathy_Left', 'Adenopathy_No', 'Adenopathy_Posterior', 'Adenopathy_Right', 'Pathology_Follicular', 'Pathology_Hurthel cell', 'Pathology_Micropapillary', 'Pathology_Papillary', 'Focality_Multi-Focal', 'Focality_Uni-Focal', 'Risk_High', 'Risk_Intermediate', 'Risk_Low', 'T_T1a', 'T_T1b', 'T_T2', 'T_T3a', 'T_T3b', 'T_T4a', 'T_T4b', 'N_N0', 'N_N1a', 'N_N1b', 'M_M0', 'M_M1', 'Stage_I', 'Stage_II', 'Stage_III', 'Stage_IVA', 'Stage_IVB', 'Response_Biochemical Incomplete', 'Response_Excellent', 'Response_Indeterminate', 'Response_Structural Incomplete', 'Recurred']
+columnas_categoricas: []
+columnas_constantes: []
+nombres_columnas: ['Age', 'Gender_F', 'Gender_M', 'Smoking_No', 'Smoking_Yes', 'Hx Smoking_No', 'Hx Smoking_Yes', 'Hx Radiothreapy_No', 'Hx Radiothreapy_Yes', 'Thyroid Function_Clinical Hyperthyroidism', 'Thyroid Function_Clinical Hypothyroidism', 'Thyroid Function_Euthyroid', 'Thyroid Function_Subclinical Hyperthyroidism', 'Thyroid Function_Subclinical Hypothyroidism', 'Physical Examination_Diffuse goiter', 'Physical Examination_Multinodular goiter', 'Physical Examination_Normal', 'Physical Examination_Single nodular goiter-left', 'Physical Examination_Single nodular goiter-right', 'Adenopathy_Bilateral', 'Adenopathy_Extensive', 'Adenopathy_Left', 'Adenopathy_No', 'Adenopathy_Posterior', 'Adenopathy_Right', 'Pathology_Follicular', 'Pathology_Hurthel cell', 'Pathology_Micropapillary', 'Pathology_Papillary', 'Focality_Multi-Focal', 'Focality_Uni-Focal', 'Risk_High', 'Risk_Intermediate', 'Risk_Low', 'T_T1a', 'T_T1b', 'T_T2', 'T_T3a', 'T_T3b', 'T_T4a', 'T_T4b', 'N_N0', 'N_N1a', 'N_N1b', 'M_M0', 'M_M1', 'Stage_I', 'Stage_II', 'Stage_III', 'Stage_IVA', 'Stage_IVB', 'Response_Biochemical Incomplete', 'Response_Excellent', 'Response_Indeterminate', 'Response_Structural Incomplete', 'Recurred']
+caracteristicas: 55
+nombre_target: Recurred
+numero_clases: 2
+distribucion_clases: {0: 220, 1: 86}
+tipo_problema: Clasificación Binaria
+ratio_riesgo_desbalanceo: 2.56
+requiere_balanceo: True
+parametros_metodo: {'metodo': 'fotomics', 'problema': 'classification', 'semilla': 1, 'numero_features': 55, 'image_dim': 8}
+
+PREPROCESAMIENTO
+----------------------------------------------------------------------
+filas_con_nulos_eliminadas: 0
+columnas_eliminadas: []
+columnas_categoricas: ['Gender', 'Smoking', 'Hx Smoking', 'Hx Radiothreapy', 'Thyroid Function', 'Physical Examination', 'Adenopathy', 'Pathology', 'Focality', 'Risk', 'T', 'N', 'M', 'Stage', 'Response']
+columnas_numericas: ['Age']
+encoding_aplicado: True
+escalado_aplicado: True
+mapa_clases: {0: 'No', 1: 'Yes'}
+
+CONFIGURACIÓN DEL MÉTODO
+----------------------------------------------------------------------
+metodo: fotomics
+problema: classification
+semilla: 1
+numero_features: 55
+image_dim: 8
+
+RESULTADOS
+----------------------------------------------------------------------
+Carpeta de salida: D:\VICTOR\TINTOlib\Image\Experimentos\Thyroid_Diff_Original_LOTE_01\FOLD_2\Imagenes\EXP_FOTOMICS_TRAIN
+Imágenes esperadas: 306
+Imágenes generadas: 306
+Cantidad correcta: True
+Resoluciones encontradas: 8x8
+Resolución consistente: True
+
+ARCHIVOS GENERADOS
+----------------------------------------------------------------------
+- 00\000000.png
+- 00\000001.png
+- 00\000002.png
+- 00\000003.png
+- 00\000004.png
+- 00\000005.png
+- 00\000006.png
+- 00\000007.png
+- 00\000008.png
+- 00\000009.png
+- 00\000010.png
+- 00\000011.png
+- 00\000012.png
+- 00\000013.png
+- 00\000014.png
+- 00\000015.png
+- 00\000016.png
+- 00\000017.png
+- 00\000018.png
+- 00\000019.png
+- 00\000020.png
+- 00\000021.png
+- 00\000022.png
+- 00\000023.png
+- 00\000024.png
+- 00\000025.png
+- 00\000026.png
+- 00\000027.png
+- 00\000028.png
+- 00\000029.png
+- 00\000030.png
+- 00\000031.png
+- 00\000032.png
+- 00\000033.png
+- 00\000034.png
+- 00\000035.png
+- 00\000036.png
+- 00\000037.png
+- 00\000038.png
+- 00\000039.png
+- 00\000041.png
+- 00\000042.png
+- 00\000043.png
+- 00\000044.png
+- 00\000045.png
+- 00\000046.png
+- 00\000047.png
+- 00\000048.png
+- 00\000049.png
+- 00\000050.png
+- 00\000051.png
+- 00\000052.png
+- 00\000053.png
+- 00\000054.png
+- 00\000055.png
+- 00\000056.png
+- 00\000057.png
+- 00\000058.png
+- 00\000059.png
+- 00\000060.png
+- 00\000061.png
+- 00\000062.png
+- 00\000063.png
+- 00\000064.png
+- 00\000065.png
+- 00\000066.png
+- 00\000067.png
+- 00\000068.png
+- 00\000073.png
+- 00\000074.png
+- 00\000075.png
+- 00\000076.png
+- 00\000077.png
+- 00\000078.png
+- 00\000079.png
+- 00\000080.png
+- 00\000081.png
+- 00\000082.png
+- 00\000083.png
+- 00\000084.png
+- 00\000085.png
+- 00\000086.png
+- 00\000087.png
+- 00\000088.png
+- 00\000089.png
+- 00\000090.png
+- 00\000091.png
+- 00\000092.png
+- 00\000093.png
+- 00\000094.png
+- 00\000095.png
+- 00\000096.png
+- 00\000097.png
+- 00\000098.png
+- 00\000099.png
+- 00\000100.png
+- 00\000101.png
+- 00\000102.png
+- 00\000103.png
+- 00\000104.png
+- 00\000105.png
+- 00\000106.png
+- 00\000107.png
+- 00\000108.png
+- 00\000109.png
+- 00\000110.png
+- 00\000111.png
+- 00\000112.png
+- 00\000113.png
+- 00\000114.png
+- 00\000115.png
+- 00\000116.png
+- 00\000117.png
+- 00\000118.png
+- 00\000119.png
+- 00\000120.png
+- 00\000121.png
+- 00\000122.png
+- 00\000123.png
+- 00\000124.png
+- 00\000125.png
+- 00\000126.png
+- 00\000127.png
+- 00\000128.png
+- 00\000129.png
+- 00\000130.png
+- 00\000131.png
+- 00\000132.png
+- 00\000133.png
+- 00\000134.png
+- 00\000135.png
+- 00\000136.png
+- 00\000137.png
+- 00\000138.png
+- 00\000139.png
+- 00\000140.png
+- 00\000141.png
+- 00\000142.png
+- 00\000143.png
+- 00\000144.png
+- 00\000145.png
+- 00\000146.png
+- 00\000147.png
+- 00\000148.png
+- 00\000149.png
+- 00\000150.png
+- 00\000151.png
+- 00\000152.png
+- 00\000153.png
+- 00\000154.png
+- 00\000155.png
+- 00\000156.png
+- 00\000157.png
+- 00\000158.png
+- 00\000159.png
+- 00\000160.png
+- 00\000161.png
+- 00\000162.png
+- 00\000163.png
+- 00\000164.png
+- 00\000165.png
+- 00\000166.png
+- 00\000167.png
+- 00\000168.png
+- 00\000169.png
+- 00\000170.png
+- 00\000171.png
+- 00\000172.png
+- 00\000173.png
+- 00\000174.png
+- 00\000175.png
+- 00\000176.png
+- 00\000177.png
+- 00\000178.png
+- 00\000179.png
+- 00\000180.png
+- 00\000183.png
+- 00\000194.png
+- 00\000198.png
+- 00\000199.png
+- 00\000200.png
+- 00\000202.png
+- 00\000203.png
+- 00\000204.png
+- 00\000205.png
+- 00\000206.png
+- 00\000207.png
+- 00\000208.png
+- 00\000209.png
+- 00\000210.png
+- 00\000211.png
+- 00\000212.png
+- 00\000213.png
+- 00\000214.png
+- 00\000215.png
+- 00\000216.png
+- 00\000217.png
+- 00\000218.png
+- 00\000219.png
+- 00\000220.png
+- 00\000221.png
+- 00\000222.png
+- 00\000223.png
+- 00\000224.png
+- 00\000225.png
+- 00\000226.png
+- 00\000227.png
+- 00\000228.png
+- 00\000229.png
+- 00\000230.png
+- 00\000231.png
+- 00\000232.png
+- 00\000233.png
+- 00\000234.png
+- 00\000235.png
+- 00\000236.png
+- 00\000237.png
+- 00\000238.png
+- 00\000239.png
+- 00\000240.png
+- 00\000243.png
+- 00\000244.png
+- 00\000247.png
+- 00\000252.png
+- 00\000259.png
+- 00\000260.png
+- 00\000261.png
+- 00\000262.png
+- 00\000264.png
+- 00\000266.png
+- 00\000272.png
+- 00\000275.png
+- 00\000298.png
+- 00\000303.png
+- 01\000040.png
+- 01\000069.png
+- 01\000070.png
+- 01\000071.png
+- 01\000072.png
+- 01\000181.png
+- 01\000182.png
+- 01\000184.png
+- 01\000185.png
+- 01\000186.png
+- 01\000187.png
+- 01\000188.png
+- 01\000189.png
+- 01\000190.png
+- 01\000191.png
+- 01\000192.png
+- 01\000193.png
+- 01\000195.png
+- 01\000196.png
+- 01\000197.png
+- 01\000201.png
+- 01\000241.png
+- 01\000242.png
+- 01\000245.png
+- 01\000246.png
+- 01\000248.png
+- 01\000249.png
+- 01\000250.png
+- 01\000251.png
+- 01\000253.png
+- 01\000254.png
+- 01\000255.png
+- 01\000256.png
+- 01\000257.png
+- 01\000258.png
+- 01\000263.png
+- 01\000265.png
+- 01\000267.png
+- 01\000268.png
+- 01\000269.png
+- 01\000270.png
+- 01\000271.png
+- 01\000273.png
+- 01\000274.png
+- 01\000276.png
+- 01\000277.png
+- 01\000278.png
+- 01\000279.png
+- 01\000280.png
+- 01\000281.png
+- 01\000282.png
+- 01\000283.png
+- 01\000284.png
+- 01\000285.png
+- 01\000286.png
+- 01\000287.png
+- 01\000288.png
+- 01\000289.png
+- 01\000290.png
+- 01\000291.png
+- 01\000292.png
+- 01\000293.png
+- 01\000294.png
+- 01\000295.png
+- 01\000296.png
+- 01\000297.png
+- 01\000299.png
+- 01\000300.png
+- 01\000301.png
+- 01\000302.png
+- 01\000304.png
+- 01\000305.png
+- classification.csv
+- etiquetas.csv
+- features_positions.csv
+
+ERROR
+----------------------------------------------------------------------
+Ninguno.
+
+ESTADO FINAL
+----------------------------------------------------------------------
+Experimento válido: True
+Estado: COMPLETADO
+
+======================================================================

@@ -1,0 +1,272 @@
+======================================================================
+REGISTRO DE EXPERIMENTO
+======================================================================
+
+IDENTIFICACIÓN
+----------------------------------------------------------------------
+Lote/Experimento: Thyroid_Diff_Original_LOTE_01_FOLD_2
+Método: EXP_REFINED_TRAIN
+Estado: FALLIDO
+Fecha de inicio: 2026-09-21 20:56:40
+Fecha de finalización: 2026-09-21 20:56:43
+Tiempo de transformación: 2.649390 segundos
+Tiempo de verificación: 0.000533 segundos
+Tiempo total del experimento: 2.650071 segundos
+
+DATASET
+----------------------------------------------------------------------
+nombre_dataset: Thyroid_Diff_Original_FOLD2_TRAIN
+muestras: 306
+columnas_totales: 56
+columnas_numericas: ['Age', 'Gender_F', 'Gender_M', 'Smoking_No', 'Smoking_Yes', 'Hx Smoking_No', 'Hx Smoking_Yes', 'Hx Radiothreapy_No', 'Hx Radiothreapy_Yes', 'Thyroid Function_Clinical Hyperthyroidism', 'Thyroid Function_Clinical Hypothyroidism', 'Thyroid Function_Euthyroid', 'Thyroid Function_Subclinical Hyperthyroidism', 'Thyroid Function_Subclinical Hypothyroidism', 'Physical Examination_Diffuse goiter', 'Physical Examination_Multinodular goiter', 'Physical Examination_Normal', 'Physical Examination_Single nodular goiter-left', 'Physical Examination_Single nodular goiter-right', 'Adenopathy_Bilateral', 'Adenopathy_Extensive', 'Adenopathy_Left', 'Adenopathy_No', 'Adenopathy_Posterior', 'Adenopathy_Right', 'Pathology_Follicular', 'Pathology_Hurthel cell', 'Pathology_Micropapillary', 'Pathology_Papillary', 'Focality_Multi-Focal', 'Focality_Uni-Focal', 'Risk_High', 'Risk_Intermediate', 'Risk_Low', 'T_T1a', 'T_T1b', 'T_T2', 'T_T3a', 'T_T3b', 'T_T4a', 'T_T4b', 'N_N0', 'N_N1a', 'N_N1b', 'M_M0', 'M_M1', 'Stage_I', 'Stage_II', 'Stage_III', 'Stage_IVA', 'Stage_IVB', 'Response_Biochemical Incomplete', 'Response_Excellent', 'Response_Indeterminate', 'Response_Structural Incomplete', 'Recurred']
+columnas_categoricas: []
+columnas_constantes: []
+nombres_columnas: ['Age', 'Gender_F', 'Gender_M', 'Smoking_No', 'Smoking_Yes', 'Hx Smoking_No', 'Hx Smoking_Yes', 'Hx Radiothreapy_No', 'Hx Radiothreapy_Yes', 'Thyroid Function_Clinical Hyperthyroidism', 'Thyroid Function_Clinical Hypothyroidism', 'Thyroid Function_Euthyroid', 'Thyroid Function_Subclinical Hyperthyroidism', 'Thyroid Function_Subclinical Hypothyroidism', 'Physical Examination_Diffuse goiter', 'Physical Examination_Multinodular goiter', 'Physical Examination_Normal', 'Physical Examination_Single nodular goiter-left', 'Physical Examination_Single nodular goiter-right', 'Adenopathy_Bilateral', 'Adenopathy_Extensive', 'Adenopathy_Left', 'Adenopathy_No', 'Adenopathy_Posterior', 'Adenopathy_Right', 'Pathology_Follicular', 'Pathology_Hurthel cell', 'Pathology_Micropapillary', 'Pathology_Papillary', 'Focality_Multi-Focal', 'Focality_Uni-Focal', 'Risk_High', 'Risk_Intermediate', 'Risk_Low', 'T_T1a', 'T_T1b', 'T_T2', 'T_T3a', 'T_T3b', 'T_T4a', 'T_T4b', 'N_N0', 'N_N1a', 'N_N1b', 'M_M0', 'M_M1', 'Stage_I', 'Stage_II', 'Stage_III', 'Stage_IVA', 'Stage_IVB', 'Response_Biochemical Incomplete', 'Response_Excellent', 'Response_Indeterminate', 'Response_Structural Incomplete', 'Recurred']
+caracteristicas: 55
+nombre_target: Recurred
+numero_clases: 2
+distribucion_clases: {0: 220, 1: 86}
+tipo_problema: Clasificación Binaria
+ratio_riesgo_desbalanceo: 2.56
+requiere_balanceo: True
+parametros_metodo: {'metodo': 'refined', 'problema': 'classification', 'semilla': 1, 'numero_features': 55, 'n_processors': 20}
+
+PREPROCESAMIENTO
+----------------------------------------------------------------------
+filas_con_nulos_eliminadas: 0
+columnas_eliminadas: []
+columnas_categoricas: ['Gender', 'Smoking', 'Hx Smoking', 'Hx Radiothreapy', 'Thyroid Function', 'Physical Examination', 'Adenopathy', 'Pathology', 'Focality', 'Risk', 'T', 'N', 'M', 'Stage', 'Response']
+columnas_numericas: ['Age']
+encoding_aplicado: True
+escalado_aplicado: True
+mapa_clases: {0: 'No', 1: 'Yes'}
+
+CONFIGURACIÓN DEL MÉTODO
+----------------------------------------------------------------------
+metodo: refined
+problema: classification
+semilla: 1
+numero_features: 55
+n_processors: 20
+
+RESULTADOS
+----------------------------------------------------------------------
+Carpeta de salida: D:\VICTOR\TINTOlib\Image\Experimentos\Thyroid_Diff_Original_LOTE_01\FOLD_2\Imagenes\EXP_REFINED_TRAIN
+Imágenes esperadas: 306
+Imágenes generadas: 0
+Cantidad correcta: False
+Resoluciones encontradas: No determinadas
+Resolución consistente: True
+
+ARCHIVOS GENERADOS
+----------------------------------------------------------------------
+- etiquetas.csv
+
+ERROR
+----------------------------------------------------------------------
+Tipo: Exception
+Mensaje: [unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(874136591) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000A6E6DDFD58) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=874136591
+:
+system msg for write_line failure : No error
+Abort(605701135) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000070825E0198) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=605701135
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(739918863) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000048141E0008) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=739918863
+:
+system msg for write_line failure : No error
+[unset]: 
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(941245455) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000A20BBDFF38) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=941245455
+:
+system msg for write_line failure : No error
+Abort(874136591) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000004EF6DDFDB8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=874136591
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(941245455) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000001F793DFCC8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=941245455
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(404374543) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000F6B89DFF38) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+write_line error; fd=-1 buf=:cmd=abort exitcode=404374543
+:
+system msg for write_line failure : No error
+Abort(203047951) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000045B55E0058) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+write_line error; fd=-1 buf=:cmd=abort exitcode=203047951
+:
+system msg for write_line failure : No error
+Abort(739918863) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000001001DFF58) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=739918863
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(672809999) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000032481DFF48) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=672809999
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(471483407) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000063E75DFF98) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=471483407
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(337265679) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000001871BDFCA8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=337265679
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(471483407) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000000F81BDFD48) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=471483407
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(941245455) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000E0C8DE00A8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=941245455
+:
+unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+system msg for write_line failure : No error
+Abort(135939087) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000FC65BE01B8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=135939087
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(337265679) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000004773BE02C8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+write_line error; fd=-1 buf=:cmd=abort exitcode=337265679
+:
+system msg for write_line failure : No error
+Abort(471483407) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000088C27E00B8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=471483407
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(874136591) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000C8BF7DFE08) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(337265679) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000005D97BDFF68) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=874136591
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=337265679
+:
+system msg for write_line failure 
+system msg for write_line failure 
+: 
+: 
+No error
+No error
+
+
+[unset]: unable to decode hostport from ba537636-0eee-4e49-95b9-3a2d78c0808d
+Abort(1721359) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000002BF5FE0028) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=1721359
+:
+system msg for write_line failure : No error
+
+
+ESTADO FINAL
+----------------------------------------------------------------------
+Experimento válido: False
+Estado: FALLIDO
+
+======================================================================

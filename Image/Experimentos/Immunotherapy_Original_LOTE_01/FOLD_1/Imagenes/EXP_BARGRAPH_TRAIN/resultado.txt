@@ -1,0 +1,146 @@
+======================================================================
+REGISTRO DE EXPERIMENTO
+======================================================================
+
+IDENTIFICACIÓN
+----------------------------------------------------------------------
+Lote/Experimento: Immunotherapy_Original_LOTE_01_FOLD_1
+Método: EXP_BARGRAPH_TRAIN
+Estado: COMPLETADO
+Fecha de inicio: 2026-09-21 20:52:48
+Fecha de finalización: 2026-09-21 20:52:48
+Tiempo de transformación: 0.027157 segundos
+Tiempo de verificación: 0.009767 segundos
+Tiempo total del experimento: 0.037149 segundos
+
+DATASET
+----------------------------------------------------------------------
+nombre_dataset: Immunotherapy_Original_FOLD1_TRAIN
+muestras: 72
+columnas_totales: 8
+columnas_numericas: ['sex', 'age', 'Time', 'Number_of_Warts', 'Type', 'Area', 'induration_diameter', 'Result_of_Treatment']
+columnas_categoricas: []
+columnas_constantes: []
+nombres_columnas: ['sex', 'age', 'Time', 'Number_of_Warts', 'Type', 'Area', 'induration_diameter', 'Result_of_Treatment']
+caracteristicas: 7
+nombre_target: Result_of_Treatment
+numero_clases: 2
+distribucion_clases: {1: 56, 0: 16}
+tipo_problema: Clasificación Binaria
+ratio_riesgo_desbalanceo: 3.5
+requiere_balanceo: True
+parametros_metodo: {'metodo': 'bargraph', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}
+
+PREPROCESAMIENTO
+----------------------------------------------------------------------
+filas_con_nulos_eliminadas: 0
+columnas_eliminadas: []
+columnas_categoricas: []
+columnas_numericas: ['sex', 'age', 'Time', 'Number_of_Warts', 'Type', 'Area', 'induration_diameter']
+encoding_aplicado: False
+escalado_aplicado: True
+mapa_clases: {0: np.int64(0), 1: np.int64(1)}
+
+CONFIGURACIÓN DEL MÉTODO
+----------------------------------------------------------------------
+metodo: bargraph
+problema: classification
+semilla: 1
+numero_features: 7
+
+RESULTADOS
+----------------------------------------------------------------------
+Carpeta de salida: D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_1\Imagenes\EXP_BARGRAPH_TRAIN
+Imágenes esperadas: 72
+Imágenes generadas: 72
+Cantidad correcta: True
+Resoluciones encontradas: 6x6
+Resolución consistente: True
+
+ARCHIVOS GENERADOS
+----------------------------------------------------------------------
+- 00\000000.png
+- 00\000001.png
+- 00\000002.png
+- 00\000003.png
+- 00\000004.png
+- 00\000005.png
+- 00\000006.png
+- 00\000007.png
+- 00\000008.png
+- 00\000009.png
+- 00\000010.png
+- 00\000011.png
+- 00\000012.png
+- 00\000013.png
+- 00\000014.png
+- 00\000015.png
+- 00\000016.png
+- 00\000017.png
+- 00\000018.png
+- 00\000019.png
+- 00\000020.png
+- 00\000021.png
+- 00\000022.png
+- 00\000023.png
+- 00\000024.png
+- 00\000025.png
+- 00\000026.png
+- 00\000027.png
+- 00\000028.png
+- 00\000029.png
+- 00\000030.png
+- 00\000031.png
+- 00\000032.png
+- 00\000033.png
+- 00\000034.png
+- 00\000035.png
+- 00\000036.png
+- 00\000037.png
+- 00\000038.png
+- 00\000039.png
+- 00\000040.png
+- 00\000041.png
+- 00\000042.png
+- 00\000043.png
+- 00\000044.png
+- 00\000045.png
+- 00\000046.png
+- 00\000047.png
+- 00\000048.png
+- 00\000049.png
+- 00\000050.png
+- 00\000051.png
+- 00\000052.png
+- 00\000053.png
+- 00\000054.png
+- 00\000055.png
+- 00\000056.png
+- 00\000057.png
+- 00\000058.png
+- 00\000059.png
+- 00\000060.png
+- 00\000061.png
+- 00\000062.png
+- 00\000063.png
+- 00\000064.png
+- 00\000065.png
+- 00\000066.png
+- 00\000067.png
+- 00\000068.png
+- 00\000069.png
+- 00\000070.png
+- 00\000071.png
+- classification.csv
+- etiquetas.csv
+
+ERROR
+----------------------------------------------------------------------
+Ninguno.
+
+ESTADO FINAL
+----------------------------------------------------------------------
+Experimento válido: True
+Estado: COMPLETADO
+
+======================================================================

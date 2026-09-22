@@ -1,0 +1,12 @@
+feature,row,column
+age,0,0
+anaemia,0,1
+creatinine_phosphokinase,1,3
+diabetes,0,2
+ejection_fraction,2,1
+high_blood_pressure,1,1
+platelets,1,0
+serum_creatinine,0,3
+serum_sodium,2,2
+sex,2,0
+smoking,1,2

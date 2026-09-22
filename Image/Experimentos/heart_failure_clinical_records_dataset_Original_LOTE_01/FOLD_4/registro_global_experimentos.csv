@@ -1,0 +1,253 @@
+dataset_nombre,dataset_muestras,dataset_caracteristicas,dataset_clases,dataset_desbalanceado,prep_categoricas,prep_numericas,prep_encoding,prep_escalado,trans_metodo,trans_parametros,trans_resolucion,trans_tiempo_seg,lote,total_folds,fold_actual,estado,valido,error,ruta_salida
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_TINTO_TRAIN,"{'metodo': 'tinto', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",20x20,0.224063,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_TINTO_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_TINTO_TEST,"{'metodo': 'tinto', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",20x20,0.05244,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_TINTO_TEST
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_IGTD_TRAIN,"{'metodo': 'igtd', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'scale': [4, 4]}",4x4,0.282514,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_IGTD_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_IGTD_TEST,"{'metodo': 'igtd', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'scale': [4, 4]}",4x4,0.040979,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_IGTD_TEST
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_REFINED_TRAIN,"{'metodo': 'refined', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'n_processors': 20}",N/A,2.442419,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,FALLIDO,False,"[unset]: unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(1721359) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000B1325DFD18) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=1721359
+:
+system msg for write_line failure : No error
+[unset]: 
+[unset]: 
+unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(1008354319) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000004667FDFD08) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(1721359) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000C84B3E0218) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=1008354319
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=1721359
+:
+system msg for write_line failure 
+system msg for write_line failure 
+: 
+: 
+No error
+No error
+
+
+[unset]: unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(404374543) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000002154FE0388) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=404374543
+:
+system msg for write_line failure : No error
+[unset]: 
+[unset]: 
+unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(807027727) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000A7E7DE0388) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(203047951) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000015BE1DFEB8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=807027727
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=203047951
+:
+system msg for write_line failure 
+system msg for write_line failure 
+: 
+: 
+No error
+No error
+
+
+[unset]: unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(941245455) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000082655E0298) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=941245455
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(270156815) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000001A333DFF58) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=270156815
+:
+system msg for write_line failure : No error
+[unset]: 
+[unset]: 
+[unset]: 
+[unset]: 
+unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(605701135) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000755B5E0268) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(471483407) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000005CE77E01B8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(1008354319) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000B5135E0428) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(941245455) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000D3259DFED8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=605701135
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=471483407
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=1008354319
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=941245455
+:
+system msg for write_line failure 
+system msg for write_line failure 
+system msg for write_line failure 
+system msg for write_line failure 
+: 
+: 
+: 
+: 
+No error
+No error
+No error
+No error
+
+
+
+
+[unset]: unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(672809999) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000046D29E03E8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=672809999
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(538592271) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000BBE45DFD48) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=538592271
+:
+system msg for write_line failure : No error
+[unset]: 
+[unset]: 
+unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(538592271) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000BF4E3E0298) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(739918863) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000005C141DFF98) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=538592271
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=739918863
+:
+system msg for write_line failure 
+system msg for write_line failure 
+: 
+: 
+No error
+No error
+
+
+[unset]: unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(135939087) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000B83F9DFFB8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=135939087
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(203047951) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000003EAF5E00F8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=203047951
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(270156815) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000AC96FE0028) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=270156815
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 3498c2a8-e220-4dbd-a9b7-0a7712b8a0ed
+Abort(404374543) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000F21D5E0298) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=404374543
+:
+system msg for write_line failure : No error
+",D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_REFINED_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_REFINED_TEST,"{'metodo': 'refined', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'n_processors': 20}",N/A,1.5e-05,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,FALLIDO,False,The model must be fitted before calling 'transform'. Please call 'fit' first.,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_REFINED_TEST
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_BARGRAPH_TRAIN,"{'metodo': 'bargraph', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",11x11,0.08104,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_BARGRAPH_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_BARGRAPH_TEST,"{'metodo': 'bargraph', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",11x11,0.023587,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_BARGRAPH_TEST
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_DISTANCEMATRIX_TRAIN,"{'metodo': 'distancematrix', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",11x11,0.087799,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_DISTANCEMATRIX_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_DISTANCEMATRIX_TEST,"{'metodo': 'distancematrix', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",11x11,0.025788,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_DISTANCEMATRIX_TEST
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_COMBINATION_TRAIN,"{'metodo': 'combination', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",11x11,0.099738,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_COMBINATION_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_COMBINATION_TEST,"{'metodo': 'combination', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",11x11,0.119107,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_COMBINATION_TEST
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_SUPERTML_TRAIN,"{'metodo': 'supertml', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",224x224,1.753407,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_SUPERTML_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_SUPERTML_TEST,"{'metodo': 'supertml', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",224x224,0.3587,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_SUPERTML_TEST
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_FEATUREWRAP_TRAIN,"{'metodo': 'featurewrap', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'size': (4, 4)}",4x4,0.220482,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_FEATUREWRAP_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_FEATUREWRAP_TEST,"{'metodo': 'featurewrap', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'size': (4, 4)}",4x4,0.052212,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_FEATUREWRAP_TEST
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_BIE_TRAIN,"{'metodo': 'bie', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",32x11,0.171713,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_BIE_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_BIE_TEST,"{'metodo': 'bie', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}",32x11,0.046904,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_BIE_TEST
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_FOTOMICS_TRAIN,"{'metodo': 'fotomics', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'image_dim': 4}",4x4,0.196977,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_FOTOMICS_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_FOTOMICS_TEST,"{'metodo': 'fotomics', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'image_dim': 4}",4x4,0.053537,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_FOTOMICS_TEST
+heart_failure_clinical_records_dataset_Original_FOLD4_TRAIN,239,12,2,True,0,12,False,True,EXP_DEEPINSIGHT_TRAIN,"{'metodo': 'deepinsight', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'image_dim': 4}",4x4,0.188194,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_DEEPINSIGHT_TRAIN
+heart_failure_clinical_records_dataset_Original_FOLD4_TEST,60,12,2,True,0,12,False,True,EXP_DEEPINSIGHT_TEST,"{'metodo': 'deepinsight', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'image_dim': 4}",4x4,0.050285,heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_4,5,4,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_4\Imagenes\EXP_DEEPINSIGHT_TEST

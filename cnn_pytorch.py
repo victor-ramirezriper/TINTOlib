@@ -407,7 +407,7 @@ def entrenar_y_evaluar_cnn(
             _, preds = torch.max(outputs, 1)
 
             # CORREGIDO: labels y preds se envían al CPU antes de convertir a numpy
-            y_true.extend(labels.cpu().numpy())
+            y_true.extend(labels.cpu().numpy())     
             y_pred.extend(preds.cpu().numpy())
             y_proba.extend(probs.cpu().numpy())
 

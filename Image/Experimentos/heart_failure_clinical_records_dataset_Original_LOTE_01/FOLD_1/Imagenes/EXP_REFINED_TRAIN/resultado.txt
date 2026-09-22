@@ -1,0 +1,280 @@
+======================================================================
+REGISTRO DE EXPERIMENTO
+======================================================================
+
+IDENTIFICACIÓN
+----------------------------------------------------------------------
+Lote/Experimento: heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_1
+Método: EXP_REFINED_TRAIN
+Estado: FALLIDO
+Fecha de inicio: 2026-09-21 20:51:58
+Fecha de finalización: 2026-09-21 20:52:00
+Tiempo de transformación: 2.373868 segundos
+Tiempo de verificación: 0.000730 segundos
+Tiempo total del experimento: 2.374817 segundos
+
+DATASET
+----------------------------------------------------------------------
+nombre_dataset: heart_failure_clinical_records_dataset_Original_FOLD1_TRAIN
+muestras: 239
+columnas_totales: 13
+columnas_numericas: ['age', 'anaemia', 'creatinine_phosphokinase', 'diabetes', 'ejection_fraction', 'high_blood_pressure', 'platelets', 'serum_creatinine', 'serum_sodium', 'sex', 'smoking', 'time', 'DEATH_EVENT']
+columnas_categoricas: []
+columnas_constantes: []
+nombres_columnas: ['age', 'anaemia', 'creatinine_phosphokinase', 'diabetes', 'ejection_fraction', 'high_blood_pressure', 'platelets', 'serum_creatinine', 'serum_sodium', 'sex', 'smoking', 'time', 'DEATH_EVENT']
+caracteristicas: 12
+nombre_target: DEATH_EVENT
+numero_clases: 2
+distribucion_clases: {0: 163, 1: 76}
+tipo_problema: Clasificación Binaria
+ratio_riesgo_desbalanceo: 2.14
+requiere_balanceo: True
+parametros_metodo: {'metodo': 'refined', 'problema': 'classification', 'semilla': 1, 'numero_features': 12, 'n_processors': 20}
+
+PREPROCESAMIENTO
+----------------------------------------------------------------------
+filas_con_nulos_eliminadas: 0
+columnas_eliminadas: []
+columnas_categoricas: []
+columnas_numericas: ['age', 'anaemia', 'creatinine_phosphokinase', 'diabetes', 'ejection_fraction', 'high_blood_pressure', 'platelets', 'serum_creatinine', 'serum_sodium', 'sex', 'smoking', 'time']
+encoding_aplicado: False
+escalado_aplicado: True
+mapa_clases: {0: np.int64(0), 1: np.int64(1)}
+
+CONFIGURACIÓN DEL MÉTODO
+----------------------------------------------------------------------
+metodo: refined
+problema: classification
+semilla: 1
+numero_features: 12
+n_processors: 20
+
+RESULTADOS
+----------------------------------------------------------------------
+Carpeta de salida: D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_1\Imagenes\EXP_REFINED_TRAIN
+Imágenes esperadas: 239
+Imágenes generadas: 0
+Cantidad correcta: False
+Resoluciones encontradas: No determinadas
+Resolución consistente: True
+
+ARCHIVOS GENERADOS
+----------------------------------------------------------------------
+- etiquetas.csv
+
+ERROR
+----------------------------------------------------------------------
+Tipo: Exception
+Mensaje: [unset]: 
+[unset]: 
+[unset]: 
+unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(1008354319) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000017EC9DFEC8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(941245455) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000008E315DFFD8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(739918863) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000033F5FDFF08) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=1008354319
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=941245455
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=739918863
+:
+system msg for write_line failure 
+system msg for write_line failure 
+system msg for write_line failure 
+: 
+: 
+: 
+No error
+No error
+No error
+
+
+
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(1721359) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000006267E0208) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=1721359
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(337265679) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000BC063DFE48) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=337265679
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(739918863) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000000F2CFDFE78) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=739918863
+:
+system msg for write_line failure : No error
+[unset]: 
+[unset]: 
+unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(203047951) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000DDB0DDFDC8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(203047951) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000DFE17DFE98) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=203047951
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=203047951
+:
+system msg for write_line failure 
+system msg for write_line failure 
+: 
+: 
+No error
+No error
+
+
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(605701135) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000B6CBDDFE58) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=605701135
+:
+system msg for write_line failure : No error
+Abort(807027727) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000019485E03E8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=807027727
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(807027727) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000093D39E0438) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=807027727
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(739918863) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000A682FDFCC8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=739918863
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(941245455) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000001E911E0048) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=941245455
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(739918863) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000008627E0478) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=739918863
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(672809999) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000374A1DFF68) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=672809999
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(1721359) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000A22D7E0078) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=1721359
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(68830223) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000C8ED3E0108) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=68830223
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(203047951) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000003DB63E02F8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=203047951
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(270156815) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000001C151E0008) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=270156815
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from b2d2b7c4-af05-492f-a429-fa324cb06a3b
+Abort(941245455) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000004ABAFE02E8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=941245455
+:
+system msg for write_line failure : No error
+
+
+ESTADO FINAL
+----------------------------------------------------------------------
+Experimento válido: False
+Estado: FALLIDO
+
+======================================================================

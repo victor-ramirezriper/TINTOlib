@@ -1,0 +1,94 @@
+======================================================================
+REGISTRO DE EXPERIMENTO
+======================================================================
+
+IDENTIFICACIÓN
+----------------------------------------------------------------------
+Lote/Experimento: Cryotherapy_Original_LOTE_01_FOLD_5
+Método: EXP_FOTOMICS_TEST
+Estado: COMPLETADO
+Fecha de inicio: 2026-09-21 20:51:12
+Fecha de finalización: 2026-09-21 20:51:12
+Tiempo de transformación: 0.018688 segundos
+Tiempo de verificación: 0.003089 segundos
+Tiempo total del experimento: 0.021996 segundos
+
+DATASET
+----------------------------------------------------------------------
+nombre_dataset: Cryotherapy_Original_FOLD5_TEST
+muestras: 18
+columnas_totales: 7
+columnas_numericas: ['sex', 'age', 'Time', 'Number_of_Warts', 'Type', 'Area', 'Result_of_Treatment']
+columnas_categoricas: []
+columnas_constantes: []
+nombres_columnas: ['sex', 'age', 'Time', 'Number_of_Warts', 'Type', 'Area', 'Result_of_Treatment']
+caracteristicas: 6
+nombre_target: Result_of_Treatment
+numero_clases: 2
+distribucion_clases: {1: 10, 0: 8}
+tipo_problema: Clasificación Binaria
+ratio_riesgo_desbalanceo: 1.25
+requiere_balanceo: False
+parametros_metodo: {'metodo': 'fotomics', 'problema': 'classification', 'semilla': 1, 'numero_features': 6, 'image_dim': 3}
+
+PREPROCESAMIENTO
+----------------------------------------------------------------------
+filas_con_nulos_eliminadas: 0
+columnas_eliminadas: []
+columnas_categoricas: []
+columnas_numericas: ['sex', 'age', 'Time', 'Number_of_Warts', 'Type', 'Area']
+encoding_aplicado: False
+escalado_aplicado: True
+mapa_clases: {0: np.int64(0), 1: np.int64(1)}
+
+CONFIGURACIÓN DEL MÉTODO
+----------------------------------------------------------------------
+metodo: fotomics
+problema: classification
+semilla: 1
+numero_features: 6
+image_dim: 3
+
+RESULTADOS
+----------------------------------------------------------------------
+Carpeta de salida: D:\VICTOR\TINTOlib\Image\Experimentos\Cryotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_FOTOMICS_TEST
+Imágenes esperadas: 18
+Imágenes generadas: 18
+Cantidad correcta: True
+Resoluciones encontradas: 3x3
+Resolución consistente: True
+
+ARCHIVOS GENERADOS
+----------------------------------------------------------------------
+- 00\000000.png
+- 00\000001.png
+- 00\000002.png
+- 00\000003.png
+- 00\000004.png
+- 00\000005.png
+- 00\000006.png
+- 00\000007.png
+- 00\000008.png
+- 00\000009.png
+- 00\000010.png
+- 00\000011.png
+- 00\000012.png
+- 00\000013.png
+- 00\000014.png
+- 00\000015.png
+- 00\000016.png
+- 00\000017.png
+- classification.csv
+- etiquetas.csv
+- features_positions.csv
+
+ERROR
+----------------------------------------------------------------------
+Ninguno.
+
+ESTADO FINAL
+----------------------------------------------------------------------
+Experimento válido: True
+Estado: COMPLETADO
+
+======================================================================

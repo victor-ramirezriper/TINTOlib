@@ -1,0 +1,55 @@
+feature,row,column
+Age,2,3
+Gender_F,7,4
+Gender_M,0,3
+Smoking_No,7,6
+Smoking_Yes,0,2
+Hx Smoking_No,7,7
+Hx Smoking_Yes,0,1
+Hx Radiothreapy_No,7,7
+Hx Radiothreapy_Yes,0,0
+Thyroid Function_Clinical Hyperthyroidism,0,0
+Thyroid Function_Clinical Hypothyroidism,0,0
+Thyroid Function_Euthyroid,6,7
+Thyroid Function_Subclinical Hyperthyroidism,0,0
+Thyroid Function_Subclinical Hypothyroidism,0,1
+Physical Examination_Diffuse goiter,0,0
+Physical Examination_Multinodular goiter,2,6
+Physical Examination_Normal,0,0
+Physical Examination_Single nodular goiter-left,1,1
+Physical Examination_Single nodular goiter-right,3,1
+Adenopathy_Bilateral,0,3
+Adenopathy_Extensive,0,1
+Adenopathy_Left,0,1
+Adenopathy_No,7,1
+Adenopathy_Posterior,0,0
+Adenopathy_Right,0,3
+Pathology_Follicular,0,1
+Pathology_Hurthel cell,0,1
+Pathology_Micropapillary,1,0
+Pathology_Papillary,5,7
+Focality_Multi-Focal,1,7
+Focality_Uni-Focal,6,1
+Risk_High,0,2
+Risk_Intermediate,0,6
+Risk_Low,7,0
+T_T1a,1,0
+T_T1b,1,0
+T_T2,4,1
+T_T3a,1,5
+T_T3b,0,1
+T_T4a,0,1
+T_T4b,0,1
+N_N0,7,1
+N_N1a,0,1
+N_N1b,0,6
+M_M0,7,7
+M_M1,0,1
+Stage_I,7,5
+Stage_II,0,2
+Stage_III,0,0
+Stage_IVA,0,0
+Stage_IVB,0,1
+Response_Biochemical Incomplete,0,1
+Response_Excellent,6,0
+Response_Indeterminate,1,2

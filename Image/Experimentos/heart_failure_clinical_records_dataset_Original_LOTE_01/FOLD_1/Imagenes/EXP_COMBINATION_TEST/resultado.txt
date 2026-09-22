@@ -1,0 +1,134 @@
+======================================================================
+REGISTRO DE EXPERIMENTO
+======================================================================
+
+IDENTIFICACIÓN
+----------------------------------------------------------------------
+Lote/Experimento: heart_failure_clinical_records_dataset_Original_LOTE_01_FOLD_1
+Método: EXP_COMBINATION_TEST
+Estado: COMPLETADO
+Fecha de inicio: 2026-09-21 20:52:01
+Fecha de finalización: 2026-09-21 20:52:01
+Tiempo de transformación: 0.030266 segundos
+Tiempo de verificación: 0.008610 segundos
+Tiempo total del experimento: 0.039154 segundos
+
+DATASET
+----------------------------------------------------------------------
+nombre_dataset: heart_failure_clinical_records_dataset_Original_FOLD1_TEST
+muestras: 60
+columnas_totales: 13
+columnas_numericas: ['age', 'anaemia', 'creatinine_phosphokinase', 'diabetes', 'ejection_fraction', 'high_blood_pressure', 'platelets', 'serum_creatinine', 'serum_sodium', 'sex', 'smoking', 'time', 'DEATH_EVENT']
+columnas_categoricas: []
+columnas_constantes: []
+nombres_columnas: ['age', 'anaemia', 'creatinine_phosphokinase', 'diabetes', 'ejection_fraction', 'high_blood_pressure', 'platelets', 'serum_creatinine', 'serum_sodium', 'sex', 'smoking', 'time', 'DEATH_EVENT']
+caracteristicas: 12
+nombre_target: DEATH_EVENT
+numero_clases: 2
+distribucion_clases: {0: 40, 1: 20}
+tipo_problema: Clasificación Binaria
+ratio_riesgo_desbalanceo: 2.0
+requiere_balanceo: False
+parametros_metodo: {'metodo': 'combination', 'problema': 'classification', 'semilla': 1, 'numero_features': 12}
+
+PREPROCESAMIENTO
+----------------------------------------------------------------------
+filas_con_nulos_eliminadas: 0
+columnas_eliminadas: []
+columnas_categoricas: []
+columnas_numericas: ['age', 'anaemia', 'creatinine_phosphokinase', 'diabetes', 'ejection_fraction', 'high_blood_pressure', 'platelets', 'serum_creatinine', 'serum_sodium', 'sex', 'smoking', 'time']
+encoding_aplicado: False
+escalado_aplicado: True
+mapa_clases: {0: np.int64(0), 1: np.int64(1)}
+
+CONFIGURACIÓN DEL MÉTODO
+----------------------------------------------------------------------
+metodo: combination
+problema: classification
+semilla: 1
+numero_features: 12
+
+RESULTADOS
+----------------------------------------------------------------------
+Carpeta de salida: D:\VICTOR\TINTOlib\Image\Experimentos\heart_failure_clinical_records_dataset_Original_LOTE_01\FOLD_1\Imagenes\EXP_COMBINATION_TEST
+Imágenes esperadas: 60
+Imágenes generadas: 60
+Cantidad correcta: True
+Resoluciones encontradas: 11x11
+Resolución consistente: True
+
+ARCHIVOS GENERADOS
+----------------------------------------------------------------------
+- 00\000000.png
+- 00\000001.png
+- 00\000002.png
+- 00\000003.png
+- 00\000004.png
+- 00\000005.png
+- 00\000006.png
+- 00\000007.png
+- 00\000008.png
+- 00\000009.png
+- 00\000010.png
+- 00\000011.png
+- 00\000012.png
+- 00\000013.png
+- 00\000014.png
+- 00\000015.png
+- 00\000016.png
+- 00\000017.png
+- 00\000018.png
+- 00\000019.png
+- 00\000020.png
+- 00\000021.png
+- 00\000022.png
+- 00\000023.png
+- 00\000024.png
+- 00\000025.png
+- 00\000026.png
+- 00\000027.png
+- 00\000028.png
+- 00\000029.png
+- 00\000030.png
+- 00\000031.png
+- 00\000032.png
+- 00\000033.png
+- 00\000034.png
+- 00\000035.png
+- 00\000036.png
+- 00\000037.png
+- 00\000038.png
+- 00\000039.png
+- 00\000040.png
+- 00\000041.png
+- 00\000042.png
+- 00\000043.png
+- 00\000044.png
+- 00\000045.png
+- 00\000046.png
+- 00\000047.png
+- 00\000048.png
+- 00\000049.png
+- 00\000050.png
+- 00\000051.png
+- 00\000052.png
+- 00\000053.png
+- 00\000054.png
+- 00\000055.png
+- 00\000056.png
+- 00\000057.png
+- 00\000058.png
+- 00\000059.png
+- classification.csv
+- etiquetas.csv
+
+ERROR
+----------------------------------------------------------------------
+Ninguno.
+
+ESTADO FINAL
+----------------------------------------------------------------------
+Experimento válido: True
+Estado: COMPLETADO
+
+======================================================================

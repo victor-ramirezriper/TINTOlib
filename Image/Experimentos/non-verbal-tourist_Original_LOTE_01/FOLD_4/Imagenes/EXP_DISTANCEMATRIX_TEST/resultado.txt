@@ -1,0 +1,88 @@
+======================================================================
+REGISTRO DE EXPERIMENTO
+======================================================================
+
+IDENTIFICACIÓN
+----------------------------------------------------------------------
+Lote/Experimento: non-verbal-tourist_Original_LOTE_01_FOLD_4
+Método: EXP_DISTANCEMATRIX_TEST
+Estado: COMPLETADO
+Fecha de inicio: 2026-09-21 20:53:40
+Fecha de finalización: 2026-09-21 20:53:40
+Tiempo de transformación: 0.017835 segundos
+Tiempo de verificación: 0.002647 segundos
+Tiempo total del experimento: 0.020649 segundos
+
+DATASET
+----------------------------------------------------------------------
+nombre_dataset: non-verbal-tourist_Original_FOLD4_TEST
+muestras: 14
+columnas_totales: 62
+columnas_numericas: ['age', 'Tense - relaxed', 'Authoritative -anarchic ', 'Hostile - friendly', 'sex_F', 'sex_M', 'country_argentina', 'country_brasil', 'country_canada', 'country_chile', 'country_colombia', 'country_england', 'country_germany', 'country_italy', 'country_mexico', 'country_polish', 'country_russia', 'country_scotland', 'country_spain', 'country_uruguay', 'returning_no', 'returning_yes', 'GImg1_dislikes', 'GImg1_indiferent', 'GImg1_likes', 'GImg2_dislikes', 'GImg2_indiferent', 'GImg2_likes', 'GImg3_dislikes', 'GImg3_indiferent', 'GImg3_likes', 'PImg1_indiferent', 'PImg1_likes', 'PImg3_dislikes', 'PImg3_indiferent', 'PImg3_likes', 'PImg4_dislikes', 'PImg4_indiferent', 'PImg4_likes', 'PImg5_dislikes', 'TAudio1_A', 'TAudio1_B', 'TAudio1_C', 'TAudio1_D', 'TAudio2_dislikes', 'TAudio2_indiferent', 'TAudio3_dislikes', 'TAudio3_indiferent', 'TAudio3_likes', 'QAudio1_dislikes', 'QAudio1_indiferent', 'QAudio1_likes', 'QAudio2_dislikes', 'QAudio2_indiferent', 'QAudio2_likes', 'QAudio3_dislikes', 'QAudio3_indiferent', 'QAudio3_likes', 'Proxemics_dislikes', 'Proxemics_indiferent', 'Proxemics_likes', 'Type of Client']
+columnas_categoricas: []
+columnas_constantes: ['country_argentina', 'country_brasil', 'country_chile', 'country_colombia', 'country_germany', 'country_mexico', 'country_polish', 'country_russia', 'country_scotland', 'country_uruguay', 'GImg1_dislikes', 'PImg1_indiferent', 'PImg1_likes', 'QAudio1_indiferent', 'QAudio2_likes', 'Proxemics_likes']
+nombres_columnas: ['age', 'Tense - relaxed', 'Authoritative -anarchic ', 'Hostile - friendly', 'sex_F', 'sex_M', 'country_argentina', 'country_brasil', 'country_canada', 'country_chile', 'country_colombia', 'country_england', 'country_germany', 'country_italy', 'country_mexico', 'country_polish', 'country_russia', 'country_scotland', 'country_spain', 'country_uruguay', 'returning_no', 'returning_yes', 'GImg1_dislikes', 'GImg1_indiferent', 'GImg1_likes', 'GImg2_dislikes', 'GImg2_indiferent', 'GImg2_likes', 'GImg3_dislikes', 'GImg3_indiferent', 'GImg3_likes', 'PImg1_indiferent', 'PImg1_likes', 'PImg3_dislikes', 'PImg3_indiferent', 'PImg3_likes', 'PImg4_dislikes', 'PImg4_indiferent', 'PImg4_likes', 'PImg5_dislikes', 'TAudio1_A', 'TAudio1_B', 'TAudio1_C', 'TAudio1_D', 'TAudio2_dislikes', 'TAudio2_indiferent', 'TAudio3_dislikes', 'TAudio3_indiferent', 'TAudio3_likes', 'QAudio1_dislikes', 'QAudio1_indiferent', 'QAudio1_likes', 'QAudio2_dislikes', 'QAudio2_indiferent', 'QAudio2_likes', 'QAudio3_dislikes', 'QAudio3_indiferent', 'QAudio3_likes', 'Proxemics_dislikes', 'Proxemics_indiferent', 'Proxemics_likes', 'Type of Client']
+caracteristicas: 61
+nombre_target: Type of Client
+numero_clases: 5
+distribucion_clases: {2: 7, 4: 3, 3: 2, 0: 1, 1: 1}
+tipo_problema: Clasificación Multiclase
+ratio_riesgo_desbalanceo: 7.0
+requiere_balanceo: True
+parametros_metodo: {'metodo': 'distancematrix', 'problema': 'classification', 'semilla': 1, 'numero_features': 61}
+
+PREPROCESAMIENTO
+----------------------------------------------------------------------
+filas_con_nulos_eliminadas: 0
+columnas_eliminadas: ['PImg2']
+columnas_categoricas: ['sex', 'country', 'returning', 'GImg1', 'GImg2', 'GImg3', 'PImg1', 'PImg3', 'PImg4', 'PImg5', 'TAudio1', 'TAudio2', 'TAudio3', 'QAudio1', 'QAudio2', 'QAudio3', 'Proxemics']
+columnas_numericas: ['age', 'Tense - relaxed', 'Authoritative -anarchic ', 'Hostile - friendly']
+encoding_aplicado: True
+escalado_aplicado: True
+mapa_clases: {0: np.int64(0), 1: np.int64(1), 2: np.int64(2), 3: np.int64(3), 4: np.int64(4), 5: np.int64(5)}
+
+CONFIGURACIÓN DEL MÉTODO
+----------------------------------------------------------------------
+metodo: distancematrix
+problema: classification
+semilla: 1
+numero_features: 61
+
+RESULTADOS
+----------------------------------------------------------------------
+Carpeta de salida: D:\VICTOR\TINTOlib\Image\Experimentos\non-verbal-tourist_Original_LOTE_01\FOLD_4\Imagenes\EXP_DISTANCEMATRIX_TEST
+Imágenes esperadas: 14
+Imágenes generadas: 14
+Cantidad correcta: True
+Resoluciones encontradas: 60x60
+Resolución consistente: True
+
+ARCHIVOS GENERADOS
+----------------------------------------------------------------------
+- 00\000000.png
+- 00\000001.png
+- 00\000002.png
+- 00\000003.png
+- 00\000004.png
+- 00\000005.png
+- 00\000006.png
+- 00\000007.png
+- 00\000008.png
+- 00\000009.png
+- 00\000010.png
+- 00\000011.png
+- 00\000012.png
+- 00\000013.png
+- classification.csv
+- etiquetas.csv
+
+ERROR
+----------------------------------------------------------------------
+Ninguno.
+
+ESTADO FINAL
+----------------------------------------------------------------------
+Experimento válido: True
+Estado: COMPLETADO
+
+======================================================================

@@ -1,0 +1,75 @@
+======================================================================
+REGISTRO DE EXPERIMENTO
+======================================================================
+
+IDENTIFICACIÓN
+----------------------------------------------------------------------
+Lote/Experimento: Thyroid_Diff_Original_LOTE_01_FOLD_5
+Método: EXP_REFINED_TEST
+Estado: FALLIDO
+Fecha de inicio: 2026-09-21 20:57:30
+Fecha de finalización: 2026-09-21 20:57:30
+Tiempo de transformación: 0.000016 segundos
+Tiempo de verificación: 0.000475 segundos
+Tiempo total del experimento: 0.000652 segundos
+
+DATASET
+----------------------------------------------------------------------
+nombre_dataset: Thyroid_Diff_Original_FOLD5_TEST
+muestras: 76
+columnas_totales: 56
+columnas_numericas: ['Age', 'Gender_F', 'Gender_M', 'Smoking_No', 'Smoking_Yes', 'Hx Smoking_No', 'Hx Smoking_Yes', 'Hx Radiothreapy_No', 'Hx Radiothreapy_Yes', 'Thyroid Function_Clinical Hyperthyroidism', 'Thyroid Function_Clinical Hypothyroidism', 'Thyroid Function_Euthyroid', 'Thyroid Function_Subclinical Hyperthyroidism', 'Thyroid Function_Subclinical Hypothyroidism', 'Physical Examination_Diffuse goiter', 'Physical Examination_Multinodular goiter', 'Physical Examination_Normal', 'Physical Examination_Single nodular goiter-left', 'Physical Examination_Single nodular goiter-right', 'Adenopathy_Bilateral', 'Adenopathy_Extensive', 'Adenopathy_Left', 'Adenopathy_No', 'Adenopathy_Posterior', 'Adenopathy_Right', 'Pathology_Follicular', 'Pathology_Hurthel cell', 'Pathology_Micropapillary', 'Pathology_Papillary', 'Focality_Multi-Focal', 'Focality_Uni-Focal', 'Risk_High', 'Risk_Intermediate', 'Risk_Low', 'T_T1a', 'T_T1b', 'T_T2', 'T_T3a', 'T_T3b', 'T_T4a', 'T_T4b', 'N_N0', 'N_N1a', 'N_N1b', 'M_M0', 'M_M1', 'Stage_I', 'Stage_II', 'Stage_III', 'Stage_IVA', 'Stage_IVB', 'Response_Biochemical Incomplete', 'Response_Excellent', 'Response_Indeterminate', 'Response_Structural Incomplete', 'Recurred']
+columnas_categoricas: []
+columnas_constantes: ['Thyroid Function_Subclinical Hyperthyroidism', 'Physical Examination_Normal', 'Adenopathy_Posterior', 'Pathology_Hurthel cell', 'Stage_IVA']
+nombres_columnas: ['Age', 'Gender_F', 'Gender_M', 'Smoking_No', 'Smoking_Yes', 'Hx Smoking_No', 'Hx Smoking_Yes', 'Hx Radiothreapy_No', 'Hx Radiothreapy_Yes', 'Thyroid Function_Clinical Hyperthyroidism', 'Thyroid Function_Clinical Hypothyroidism', 'Thyroid Function_Euthyroid', 'Thyroid Function_Subclinical Hyperthyroidism', 'Thyroid Function_Subclinical Hypothyroidism', 'Physical Examination_Diffuse goiter', 'Physical Examination_Multinodular goiter', 'Physical Examination_Normal', 'Physical Examination_Single nodular goiter-left', 'Physical Examination_Single nodular goiter-right', 'Adenopathy_Bilateral', 'Adenopathy_Extensive', 'Adenopathy_Left', 'Adenopathy_No', 'Adenopathy_Posterior', 'Adenopathy_Right', 'Pathology_Follicular', 'Pathology_Hurthel cell', 'Pathology_Micropapillary', 'Pathology_Papillary', 'Focality_Multi-Focal', 'Focality_Uni-Focal', 'Risk_High', 'Risk_Intermediate', 'Risk_Low', 'T_T1a', 'T_T1b', 'T_T2', 'T_T3a', 'T_T3b', 'T_T4a', 'T_T4b', 'N_N0', 'N_N1a', 'N_N1b', 'M_M0', 'M_M1', 'Stage_I', 'Stage_II', 'Stage_III', 'Stage_IVA', 'Stage_IVB', 'Response_Biochemical Incomplete', 'Response_Excellent', 'Response_Indeterminate', 'Response_Structural Incomplete', 'Recurred']
+caracteristicas: 55
+nombre_target: Recurred
+numero_clases: 2
+distribucion_clases: {0: 55, 1: 21}
+tipo_problema: Clasificación Binaria
+ratio_riesgo_desbalanceo: 2.62
+requiere_balanceo: True
+parametros_metodo: {'metodo': 'refined', 'problema': 'classification', 'semilla': 1, 'numero_features': 55, 'n_processors': 20}
+
+PREPROCESAMIENTO
+----------------------------------------------------------------------
+filas_con_nulos_eliminadas: 0
+columnas_eliminadas: []
+columnas_categoricas: ['Gender', 'Smoking', 'Hx Smoking', 'Hx Radiothreapy', 'Thyroid Function', 'Physical Examination', 'Adenopathy', 'Pathology', 'Focality', 'Risk', 'T', 'N', 'M', 'Stage', 'Response']
+columnas_numericas: ['Age']
+encoding_aplicado: True
+escalado_aplicado: True
+mapa_clases: {0: 'No', 1: 'Yes'}
+
+CONFIGURACIÓN DEL MÉTODO
+----------------------------------------------------------------------
+metodo: refined
+problema: classification
+semilla: 1
+numero_features: 55
+n_processors: 20
+
+RESULTADOS
+----------------------------------------------------------------------
+Carpeta de salida: D:\VICTOR\TINTOlib\Image\Experimentos\Thyroid_Diff_Original_LOTE_01\FOLD_5\Imagenes\EXP_REFINED_TEST
+Imágenes esperadas: 76
+Imágenes generadas: 0
+Cantidad correcta: False
+Resoluciones encontradas: No determinadas
+Resolución consistente: True
+
+ARCHIVOS GENERADOS
+----------------------------------------------------------------------
+- etiquetas.csv
+
+ERROR
+----------------------------------------------------------------------
+Tipo: RuntimeError
+Mensaje: The model must be fitted before calling 'transform'. Please call 'fit' first.
+
+ESTADO FINAL
+----------------------------------------------------------------------
+Experimento válido: False
+Estado: FALLIDO
+
+======================================================================

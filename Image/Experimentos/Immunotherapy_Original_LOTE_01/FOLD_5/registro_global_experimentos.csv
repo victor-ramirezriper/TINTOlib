@@ -1,0 +1,230 @@
+dataset_nombre,dataset_muestras,dataset_caracteristicas,dataset_clases,dataset_desbalanceado,prep_categoricas,prep_numericas,prep_encoding,prep_escalado,trans_metodo,trans_parametros,trans_resolucion,trans_tiempo_seg,lote,total_folds,fold_actual,estado,valido,error,ruta_salida
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_TINTO_TRAIN,"{'metodo': 'tinto', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",20x20,0.086901,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_TINTO_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_TINTO_TEST,"{'metodo': 'tinto', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",20x20,0.017769,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_TINTO_TEST
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_IGTD_TRAIN,"{'metodo': 'igtd', 'problema': 'classification', 'semilla': 1, 'numero_features': 7, 'scale': [3, 3]}",3x3,0.05247,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_IGTD_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_IGTD_TEST,"{'metodo': 'igtd', 'problema': 'classification', 'semilla': 1, 'numero_features': 7, 'scale': [3, 3]}",3x3,0.014788,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_IGTD_TEST
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_REFINED_TRAIN,"{'metodo': 'refined', 'problema': 'classification', 'semilla': 1, 'numero_features': 7, 'n_processors': 20}",N/A,2.432103,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,FALLIDO,False,"[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(807027727) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000002F84FE0458) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(135939087) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000F78EBDFCE8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=807027727
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=135939087
+:
+system msg for write_line failure 
+system msg for write_line failure 
+: 
+: 
+No error
+No error
+
+
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(270156815) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000009E94BDFED8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=270156815
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(203047951) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000365D7DFD88) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=203047951
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(941245455) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000D0F73DFD88) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=941245455
+:
+system msg for write_line failure : No error
+[unset]: 
+[unset]: 
+unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(538592271) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000001B809E0478) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+Abort(404374543) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000F7DB7DFE98) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=538592271
+:
+write_line error; fd=-1 buf=:cmd=abort exitcode=404374543
+:
+system msg for write_line failure 
+system msg for write_line failure 
+: 
+: 
+No error
+No error
+
+
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(68830223) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000DB8BFEFE78) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=68830223
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(404374543) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000007027DFFB8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: 
+[unset]: 
+write_line error; fd=-1 buf=:cmd=abort exitcode=404374543
+:
+unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+system msg for write_line failure : No error
+Abort(1721359) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000098ADFE0388) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=1721359
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(471483407) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000097FCDDFF68) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=471483407
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(605701135) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000005E47DE02E8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=605701135
+:
+system msg for write_line failure : 
+[unset]: 
+No error
+unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+
+Abort(807027727) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000641A1E0428) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=807027727
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(203047951) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=00000042C77E01B8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=203047951
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(203047951) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000D8D55DFFE8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=203047951
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(404374543) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000EF237E0338) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=404374543
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(807027727) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000B3BC7E0118) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=807027727
+:
+system msg for write_line failure 
+Abort(672809999) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=0000004BF9DE0268) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+: 
+[unset]: 
+No error
+write_line error; fd=-1 buf=:cmd=abort exitcode=672809999
+:
+
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(874136591) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000AB3D1DFCA8) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=874136591
+:
+system msg for write_line failure : No error
+[unset]: unable to decode hostport from 7949ef3c-35fc-4e32-a980-17aa5a747f08
+Abort(203047951) on node 0 (rank 0 in comm 0): Fatal error in internal_Init_thread: Other MPI error, error stack:
+internal_Init_thread(43701): MPI_Init_thread(argc=0000000000000000, argv=0000000000000000, required=3, provided=000000E6931DFF78) failed
+MPII_Init_thread(118)......: 
+MPID_Init(1652)............: 
+MPIR_pmi_init(133).........: PMI_Init returned -1
+[unset]: write_line error; fd=-1 buf=:cmd=abort exitcode=203047951
+:
+system msg for write_line failure : No error
+",D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_REFINED_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_REFINED_TEST,"{'metodo': 'refined', 'problema': 'classification', 'semilla': 1, 'numero_features': 7, 'n_processors': 20}",N/A,1e-05,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,FALLIDO,False,The model must be fitted before calling 'transform'. Please call 'fit' first.,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_REFINED_TEST
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_BARGRAPH_TRAIN,"{'metodo': 'bargraph', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",6x6,0.024796,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_BARGRAPH_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_BARGRAPH_TEST,"{'metodo': 'bargraph', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",6x6,0.008518,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_BARGRAPH_TEST
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_DISTANCEMATRIX_TRAIN,"{'metodo': 'distancematrix', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",6x6,0.024994,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_DISTANCEMATRIX_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_DISTANCEMATRIX_TEST,"{'metodo': 'distancematrix', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",6x6,0.008473,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_DISTANCEMATRIX_TEST
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_COMBINATION_TRAIN,"{'metodo': 'combination', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",6x6,0.029543,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_COMBINATION_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_COMBINATION_TEST,"{'metodo': 'combination', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",6x6,0.009184,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_COMBINATION_TEST
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_SUPERTML_TRAIN,"{'metodo': 'supertml', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",224x224,0.270863,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_SUPERTML_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_SUPERTML_TEST,"{'metodo': 'supertml', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",224x224,0.069012,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_SUPERTML_TEST
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_FEATUREWRAP_TRAIN,"{'metodo': 'featurewrap', 'problema': 'classification', 'semilla': 1, 'numero_features': 7, 'size': (3, 3)}",3x3,0.050786,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_FEATUREWRAP_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_FEATUREWRAP_TEST,"{'metodo': 'featurewrap', 'problema': 'classification', 'semilla': 1, 'numero_features': 7, 'size': (3, 3)}",3x3,0.020186,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_FEATUREWRAP_TEST
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_BIE_TRAIN,"{'metodo': 'bie', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",32x6,0.174694,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_BIE_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_BIE_TEST,"{'metodo': 'bie', 'problema': 'classification', 'semilla': 1, 'numero_features': 7}",32x6,0.01635,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_BIE_TEST
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_FOTOMICS_TRAIN,"{'metodo': 'fotomics', 'problema': 'classification', 'semilla': 1, 'numero_features': 7, 'image_dim': 3}",3x3,0.062128,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_FOTOMICS_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_FOTOMICS_TEST,"{'metodo': 'fotomics', 'problema': 'classification', 'semilla': 1, 'numero_features': 7, 'image_dim': 3}",3x3,0.019503,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_FOTOMICS_TEST
+Immunotherapy_Original_FOLD5_TRAIN,72,7,2,True,0,7,False,True,EXP_DEEPINSIGHT_TRAIN,"{'metodo': 'deepinsight', 'problema': 'classification', 'semilla': 1, 'numero_features': 7, 'image_dim': 3}",3x3,0.058294,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_DEEPINSIGHT_TRAIN
+Immunotherapy_Original_FOLD5_TEST,18,7,2,True,0,7,False,True,EXP_DEEPINSIGHT_TEST,"{'metodo': 'deepinsight', 'problema': 'classification', 'semilla': 1, 'numero_features': 7, 'image_dim': 3}",3x3,0.017823,Immunotherapy_Original_LOTE_01_FOLD_5,5,5,COMPLETADO,True,Ninguno,D:\VICTOR\TINTOlib\Image\Experimentos\Immunotherapy_Original_LOTE_01\FOLD_5\Imagenes\EXP_DEEPINSIGHT_TEST
