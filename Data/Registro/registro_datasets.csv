@@ -1,0 +1,6 @@
+﻿Fecha_Evaluacion,UCI_ID,Dataset,Categoria,Instancias,Features,Target,Num_Clases,Min_Muestras_Clase,Max_Muestras_Clase,Nulos_NaN,Marcadores_Faltantes,Columnas_Duplicadas,Columnas_Constantes,Clasificacion,Resultado,Motivo,Nombre_CSV
+2026-09-23 15:58:59,144,Statlog (German Credit Data),PEQUEÑO,1000,20,class,2,300,700,0,Ninguno,Ninguna,Ninguna,NO,NO_APTO,El dataset no está identificado como clasificación.,
+2026-09-23 16:05:34,144,Statlog (German Credit Data),PEQUEÑO,1000,20,class,2,300,700,0,Ninguno,Ninguna,Ninguna,NO,NO_APTO,UCI no identifica el dataset como clasificación.,
+2026-09-23 16:07:45,53,Iris,FUERA_DE_CRITERIO,150,4,class,3,50,50,0,Ninguno,Ninguna,Ninguna,NO,NO_APTO,UCI no identifica el dataset como clasificación. | No cumple el rango de instancias/features.,
+2026-09-23 16:24:42,53,Iris,FUERA_DE_CRITERIO,150,4,class,3,50,50,0,Ninguno,Ninguna,Ninguna,SI,NO_APTO,No cumple el rango de instancias/features.,
+2026-09-23 16:24:56,144,Statlog (German Credit Data),PEQUEÑO,1000,20,class,2,300,700,0,Ninguno,Ninguna,Ninguna,SI,APTO,Cumple todos los criterios establecidos.,Statlog_(German_Credit_Data).csv
