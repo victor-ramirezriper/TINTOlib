@@ -1,0 +1,2 @@
+Metodo_TINTO,Accuracy,F1_Score,ROC_AUC,Tiempo_Train_s,Tiempo_Eval_s,RAM_GB,CPU_Usage_%,VRAM_GB
+REFINED,86.05 ± 2.20,85.89 ± 2.20,91.53 ± 1.94,906.36,7.05,0.75,393.74,0.0

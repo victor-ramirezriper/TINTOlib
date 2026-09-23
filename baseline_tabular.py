@@ -5,8 +5,12 @@ import numpy as np
 import warnings
 from datetime import datetime
 
-# NUEVO IMPORT: Para registrar el hardware
-import psutil 
+import psutil
+try:
+    import GPUtil
+    HAS_GPU = True
+except ImportError:
+    HAS_GPU = False
 
 from sklearn.model_selection import StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
@@ -57,6 +61,16 @@ def menu_interactivo():
 
     return nombre_archivo, ruta_dataset, target_col
 
+def obtener_metricas_gpu():
+    gpu_usage = 0.0
+    gpu_ram_gb = 0.0
+    if HAS_GPU:
+        gpus = GPUtil.getGPUs()
+        if gpus:
+            gpu_usage = gpus[0].load * 100  # Porcentaje de uso
+            gpu_ram_gb = gpus[0].memoryUsed / 1024  # Convertir MB a GB
+    return gpu_usage, gpu_ram_gb
+
 def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nombre_dataset):
     conteo_clases = y.value_counts()
     clase_mayoritaria = conteo_clases.max()
@@ -65,7 +79,6 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
     
     filas_csv = []
     
-    # Inicializar el monitor de procesos de hardware
     proceso = psutil.Process(os.getpid())
     
     estrategias = ["Original"]
@@ -77,9 +90,9 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
         print(f"\nDataset balanceado (Ratio {ratio:.2f}). Solo se ejecutará la versión Original.")
 
     for estrategia in estrategias:
-        print(f"\n" + "="*85)
+        print(f"\n" + "="*95)
         print(f"INICIANDO EVALUACIÓN: ESTRATEGIA {estrategia.upper()}")
-        print("="*85)
+        print("="*95)
         
         skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         
@@ -89,8 +102,7 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
             "MLP_Clasico": MLPClassifier(random_state=42, max_iter=1000)
         }
         
-        # Agregamos contenedores para RAM y CPU
-        resultados = {nombre: {"accuracy": [], "f1": [], "roc_auc": [], "tiempo": [], "ram": [], "cpu": []} for nombre in modelos}
+        resultados = {nombre: {"accuracy": [], "f1": [], "roc_auc": [], "tiempo": [], "ram": [], "cpu": [], "gpu_usage": [], "gpu_ram": []} for nombre in modelos}
         
         print(f"Procesando 5-Fold Cross Validation ({estrategia})...")
         
@@ -104,7 +116,6 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
             X_train_enc, X_test_enc, _, _ = aplicar_encoding_seguro(X_train_fold, X_test_fold, columnas_categoricas)
             X_train_scaled, X_test_scaled, _ = aplicar_escalado_seguro(X_train_enc, X_test_enc, columnas_numericas)
             
-            # Aplicación dinámica y segura de SMOTE
             if estrategia == "SMOTE":
                 min_muestras = pd.Series(y_train_fold_enc).value_counts().min()
                 if min_muestras > 1:
@@ -118,21 +129,19 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
             
             for nombre, modelo in modelos.items():
                 
-                # Preparamos el monitor de CPU (lo ponemos en ceros para este bloque)
                 proceso.cpu_percent(interval=None) 
                 
                 inicio = time.perf_counter()
                 
-                # Entrenamos y evaluamos
                 modelo.fit(X_train_final, y_train_final)
                 y_pred = modelo.predict(X_test_scaled)
                 y_proba = modelo.predict_proba(X_test_scaled)
                 
                 tiempo_total = time.perf_counter() - inicio
                 
-                # Capturamos el consumo exacto al terminar el modelo
                 cpu_usage = proceso.cpu_percent(interval=None)
-                ram_usage = proceso.memory_info().rss / (1024 ** 3) # Convertimos a Gigabytes
+                ram_usage = proceso.memory_info().rss / (1024 ** 3) 
+                gpu_usage, gpu_ram = obtener_metricas_gpu()
                 
                 acc = accuracy_score(y_test_fold_enc, y_pred)
                 f1 = f1_score(y_test_fold_enc, y_pred, average='macro')
@@ -152,8 +161,9 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
                 resultados[nombre]["tiempo"].append(tiempo_total)
                 resultados[nombre]["ram"].append(ram_usage)
                 resultados[nombre]["cpu"].append(cpu_usage)
+                resultados[nombre]["gpu_usage"].append(gpu_usage)
+                resultados[nombre]["gpu_ram"].append(gpu_ram)
 
-                # REPORTE Y GUARDADO POR ESTRATEGIA (Fold Individual)
                 filas_csv.append({
                     "Dataset": nombre_dataset,
                     "Estrategia": estrategia,
@@ -166,16 +176,17 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
                     "Tiempo_s": round(tiempo_total, 4),
                     "RAM_GB": round(ram_usage, 4),
                     "CPU_Usage_%": round(cpu_usage, 2),
+                    "GPU_RAM_GB": round(gpu_ram, 4),
+                    "GPU_Usage_%": round(gpu_usage, 2),
                     "Fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 })
             fold_idx += 1
 
-        # REPORTE PROMEDIADO EN CONSOLA Y GUARDADO DE CSV
-        print("\n" + "-"*85)
+        print("\n" + "-"*95)
         print(f"RESULTADOS FINALES PROMEDIADOS ({estrategia})")
-        print("-" * 85)
-        print(f"{'Modelo':<15} | {'Accuracy':<8} | {'F1-Score':<8} | {'ROC-AUC':<8} | {'Tiempo':<8} | {'RAM (GB)':<8} | {'CPU (%)'}")
-        print("-" * 85)
+        print("-" * 95)
+        print(f"{'Modelo':<15} | {'Accuracy':<8} | {'F1-Score':<8} | {'ROC-AUC':<8} | {'Tiempo':<8} | {'RAM (GB)':<8} | {'CPU (%)':<8} | {'GPU (GB)'}")
+        print("-" * 95)
         
         for nombre in modelos:
             acc_mean = np.mean(resultados[nombre]['accuracy'])
@@ -184,10 +195,11 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
             tiempo_mean = np.mean(resultados[nombre]['tiempo'])
             ram_mean = np.mean(resultados[nombre]['ram'])
             cpu_mean = np.mean(resultados[nombre]['cpu'])
+            gpu_usage_mean = np.mean(resultados[nombre]['gpu_usage'])
+            gpu_ram_mean = np.mean(resultados[nombre]['gpu_ram'])
             
-            print(f"{nombre:<15} | {acc_mean*100:>5.2f}%   | {f1_mean*100:>5.2f}%   | {roc_mean*100:>5.2f}%   | {tiempo_mean:.4f}s | {ram_mean:>6.4f}GB | {cpu_mean:>5.2f}%")
+            print(f"{nombre:<15} | {acc_mean*100:>5.2f}%   | {f1_mean*100:>5.2f}%   | {roc_mean*100:>5.2f}%   | {tiempo_mean:.4f}s | {ram_mean:>6.4f}GB | {cpu_mean:>5.2f}% | {gpu_ram_mean:>6.4f}GB")
             
-            # Guardamos también la fila del PROMEDIO FINAL
             filas_csv.append({
                 "Dataset": nombre_dataset,
                 "Estrategia": estrategia,
@@ -200,10 +212,11 @@ def evaluar_modelos_tabular(X, y, columnas_categoricas, columnas_numericas, nomb
                 "Tiempo_s": round(tiempo_mean, 4),
                 "RAM_GB": round(ram_mean, 4),
                 "CPU_Usage_%": round(cpu_mean, 2),
+                "GPU_RAM_GB": round(gpu_ram_mean, 4),
+                "GPU_Usage_%": round(gpu_usage_mean, 2),
                 "Fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })
 
-    # Guardado fuera de los bucles para consolidar todo
     df_resultados = pd.DataFrame(filas_csv)
     nombre_base = nombre_dataset.replace('.csv', '')
     ruta_salida = RESULTS_DIR / f"Baseline_{nombre_base}_COMPLETO.csv"

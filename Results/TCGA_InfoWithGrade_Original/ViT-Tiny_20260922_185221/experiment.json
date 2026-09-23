@@ -1,0 +1,17 @@
+{
+    "dataset_lote": "TCGA_InfoWithGrade_Original_LOTE_01",
+    "red_neuronal": "ViT-Tiny (Transformer)",
+    "hardware_utilizado": "CPU",
+    "estrategia_desbalanceo": "Class_Weights (Balanced)",
+    "fecha_ejecucion": "2026-09-22 17:50:45",
+    "n_splits_kfold": 5,
+    "epochs": 10,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "optimizer": "Adam",
+    "loss_function": "CrossEntropyLoss (Weighted)",
+    "seed": 42,
+    "metodos_evaluados": [
+        "REFINED"
+    ]
+}

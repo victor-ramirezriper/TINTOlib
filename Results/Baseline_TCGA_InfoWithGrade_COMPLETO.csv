@@ -1,0 +1,19 @@
+Dataset,Estrategia,Modelo,Total_Folds,Fold_Actual,Accuracy,F1_Score,ROC_AUC,Tiempo_s,RAM_GB,CPU_Usage_%,GPU_RAM_GB,GPU_Usage_%,Fecha
+TCGA_InfoWithGrade.csv,Original,Random_Forest,5,Fold_1,0.8512,0.8488,0.9207,0.4148,0.1581,72.9,0.0,0.0,2026-09-22 10:30:12
+TCGA_InfoWithGrade.csv,Original,SVM,5,Fold_1,0.875,0.8737,0.916,0.1603,0.1595,60.1,0.0,0.0,2026-09-22 10:30:12
+TCGA_InfoWithGrade.csv,Original,MLP_Clasico,5,Fold_1,0.8393,0.8367,0.8915,2.8792,0.1601,93.5,0.0,0.0,2026-09-22 10:30:15
+TCGA_InfoWithGrade.csv,Original,Random_Forest,5,Fold_2,0.8452,0.8408,0.9051,0.318,0.1601,95.0,0.0,0.0,2026-09-22 10:30:15
+TCGA_InfoWithGrade.csv,Original,SVM,5,Fold_2,0.8571,0.8561,0.9034,0.1045,0.1601,99.7,0.0,0.0,2026-09-22 10:30:16
+TCGA_InfoWithGrade.csv,Original,MLP_Clasico,5,Fold_2,0.8512,0.8488,0.9172,3.118,0.1601,99.5,0.0,0.0,2026-09-22 10:30:19
+TCGA_InfoWithGrade.csv,Original,Random_Forest,5,Fold_3,0.8512,0.8478,0.9016,0.316,0.1602,99.8,0.0,0.0,2026-09-22 10:30:19
+TCGA_InfoWithGrade.csv,Original,SVM,5,Fold_3,0.869,0.8681,0.9246,0.1123,0.1602,100.3,0.0,0.0,2026-09-22 10:30:19
+TCGA_InfoWithGrade.csv,Original,MLP_Clasico,5,Fold_3,0.8393,0.8367,0.9097,3.3469,0.1602,98.6,0.0,0.0,2026-09-22 10:30:23
+TCGA_InfoWithGrade.csv,Original,Random_Forest,5,Fold_4,0.8333,0.8271,0.9336,0.3217,0.1602,104.8,0.0,0.0,2026-09-22 10:30:23
+TCGA_InfoWithGrade.csv,Original,SVM,5,Fold_4,0.8929,0.891,0.9387,0.1126,0.1603,87.5,0.0,0.0,2026-09-22 10:30:23
+TCGA_InfoWithGrade.csv,Original,MLP_Clasico,5,Fold_4,0.8631,0.8589,0.9316,2.4909,0.1603,99.3,0.0,0.0,2026-09-22 10:30:26
+TCGA_InfoWithGrade.csv,Original,Random_Forest,5,Fold_5,0.8623,0.8603,0.9071,0.3171,0.1603,100.2,0.0,0.0,2026-09-22 10:30:26
+TCGA_InfoWithGrade.csv,Original,SVM,5,Fold_5,0.8503,0.8495,0.9109,0.1134,0.1603,113.6,0.0,0.0,2026-09-22 10:30:26
+TCGA_InfoWithGrade.csv,Original,MLP_Clasico,5,Fold_5,0.8443,0.8418,0.9147,3.1748,0.1602,99.5,0.0,0.0,2026-09-22 10:30:29
+TCGA_InfoWithGrade.csv,Original,Random_Forest,5,PROMEDIO,0.8486,0.845,0.9136,0.3375,0.1598,94.54,0.0,0.0,2026-09-22 10:30:29
+TCGA_InfoWithGrade.csv,Original,SVM,5,PROMEDIO,0.8689,0.8677,0.9187,0.1206,0.1601,92.24,0.0,0.0,2026-09-22 10:30:29
+TCGA_InfoWithGrade.csv,Original,MLP_Clasico,5,PROMEDIO,0.8474,0.8446,0.913,3.002,0.1602,98.08,0.0,0.0,2026-09-22 10:30:29
