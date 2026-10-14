@@ -1,3 +1,4 @@
+
 # Entorno virtual
 tinto_env/
 
@@ -14,3 +15,9 @@ __pycache__/
 # Archivos temporales
 *.tmp
 *.log
+
+# Datos y resultados locales
+/Results/
+/Image/
+/Data/
+/Analysis/
