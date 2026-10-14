@@ -39,7 +39,7 @@ def fijar_semillas(seed=42):
     torch.backends.cudnn.benchmark = False
 
 # ============================================================
-# 1. DATASET PERSONALIZADO (CERO FUGA DE DATOS)
+# 1. DATASET PERSONALIZADO (OPTIMIZADO: CARGA EN RAM)
 # ============================================================
 class TintoDataset(Dataset):
     def __init__(self, folder_path, transform=None):
@@ -54,7 +54,6 @@ class TintoDataset(Dataset):
         self.labels = df_etiquetas.iloc[:, 0].values 
         
         extensiones = {".png", ".jpg", ".jpeg", ".bmp"}
-        
         archivos_img = [f for f in self.folder_path.rglob('*') if f.suffix.lower() in extensiones]
         
         def extract_number(filepath):
@@ -66,13 +65,20 @@ class TintoDataset(Dataset):
         if len(self.image_files) != len(self.labels):
             raise ValueError(f"Inconsistencia en {self.folder_path}: {len(self.image_files)} imágenes vs {len(self.labels)} etiquetas.")
 
+        # ========================================================
+        # CARGA PREVIA EN RAM (Evita cuello de botella del SSD)
+        # ========================================================
+        self.cached_images = []
+        from PIL import Image
+        for img_path in self.image_files:
+            image = Image.open(img_path).convert('RGB')
+            self.cached_images.append(image)
+
     def __len__(self):
-        return len(self.image_files)
+        return len(self.cached_images)
 
     def __getitem__(self, idx):
-        img_path = self.image_files[idx]
-        from PIL import Image
-        image = Image.open(img_path).convert('RGB')
+        image = self.cached_images[idx]
         label = self.labels[idx]
 
         if self.transform:
@@ -134,7 +140,7 @@ def inicializar_modelo(nombre_red, num_clases, device):
         modelo = timm.create_model('vit_tiny_patch16_224', pretrained=True, num_classes=num_clases)
     return modelo.to(device)
 
-def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_splits=5, epochs=10, batch_size=8, lr=0.001):
+def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_splits=5, epochs=10, batch_size=32, lr=0.001):
     transformaciones = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
@@ -145,6 +151,7 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
     
     registro_folds = []
     registro_historial = []
+    registro_predicciones = []
 
     print(f"\nIniciando Validación Cruzada ({n_splits} Folds) con {red_seleccionada} para {metodo} en {device.type.upper()}...")
 
@@ -165,8 +172,10 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
 
         num_clases = len(np.unique(dataset_train.labels))
 
-        train_loader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True)
-        test_loader = DataLoader(dataset_test, batch_size=batch_size, shuffle=False)
+        train_loader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True,  num_workers=0, 
+    pin_memory=True)
+        test_loader = DataLoader(dataset_test, batch_size=batch_size, shuffle=False,  num_workers=0, 
+    pin_memory=True)
 
         modelo = inicializar_modelo(red_seleccionada, num_clases, device)
         
@@ -241,13 +250,21 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
                 probs = torch.nn.functional.softmax(outputs, dim=1)
                 _, preds = torch.max(outputs, 1)
 
-                y_true.extend(labels.numpy())
-                y_pred.extend(preds.numpy())
-                y_proba.extend(probs.numpy())
+                y_true.extend(labels.cpu.numpy())
+                y_pred.extend(preds.cpu.numpy())
+                y_proba.extend(probs.cpu.numpy())
 
         tiempo_eval_fold = time.perf_counter() - inicio_eval
 
         y_true, y_pred, y_proba = np.array(y_true), np.array(y_pred), np.array(y_proba)
+
+        for yt, yp in zip(y_true, y_pred):
+            registro_predicciones.append({
+                "Metodo": metodo,
+                "Fold": fold,
+                "y_true": int(yt),
+                "y_pred": int(yp)
+            })
 
         acc = accuracy_score(y_true, y_pred) * 100
         f1 = f1_score(y_true, y_pred, average='macro') * 100
@@ -292,9 +309,9 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
         "Max_VRAM_Mean": df_folds["Max_VRAM_GB"].mean()
     }
     
-    return resultados_agrupados, registro_folds, registro_historial
+    return resultados_agrupados, registro_folds, registro_historial, registro_predicciones
 
-def guardar_ecosistema_resultados(lote, red_seleccionada, metodos, df_resumen, lista_folds, lista_historial, parametros):
+def guardar_ecosistema_resultados(lote, red_seleccionada, metodos, df_resumen, lista_folds, lista_historial, lista_predicciones, parametros):
     nombre_dataset = lote.split("_LOTE_")[0]
     nombre_red_limpio = red_seleccionada.split(' ')[0]
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -305,6 +322,9 @@ def guardar_ecosistema_resultados(lote, red_seleccionada, metodos, df_resumen, l
     pd.DataFrame(df_resumen).to_csv(carpeta_base / "resultados_resumen.csv", index=False)
     pd.DataFrame(lista_folds).to_csv(carpeta_base / "resultados_folds.csv", index=False)
     pd.DataFrame(lista_historial).to_csv(carpeta_base / "historial_entrenamiento.csv", index=False)
+    
+    if lista_predicciones:
+        pd.DataFrame(lista_predicciones).to_csv(carpeta_base / "predicciones_folds.csv", index=False)
     
     with open(carpeta_base / "experiment.json", "w") as json_file:
         json.dump(parametros, json_file, indent=4)
@@ -326,7 +346,7 @@ if __name__ == "__main__":
         "fecha_ejecucion": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "n_splits_kfold": 5,
         "epochs": 10,
-        "batch_size": 8,
+        "batch_size": 32,  # <--- CONFIGURADO EN 32
         "learning_rate": 0.001,
         "optimizer": "Adam",
         "loss_function": "CrossEntropyLoss (Weighted)",
@@ -344,11 +364,12 @@ if __name__ == "__main__":
     resumen_total = []
     folds_totales = []
     historial_total = []
+    predicciones_totales = []
 
     for metodo in metodos:
         print(f"\n--- Evaluando método: {metodo} ---")
         try:
-            res_agrupados, res_folds, res_historial = entrenar_kfold_por_carpetas(
+            res_agrupados, res_folds, res_historial, res_preds = entrenar_kfold_por_carpetas(
                 ruta_lote, metodo, red_seleccionada, 
                 n_splits=PARAMETROS_EXP["n_splits_kfold"], 
                 epochs=PARAMETROS_EXP["epochs"],
@@ -358,6 +379,7 @@ if __name__ == "__main__":
             
             folds_totales.extend(res_folds)
             historial_total.extend(res_historial)
+            predicciones_totales.extend(res_preds)
             
             fila_resumen = {
                 "Metodo_TINTO": metodo,
@@ -380,7 +402,7 @@ if __name__ == "__main__":
     if resumen_total:
         guardar_ecosistema_resultados(
             lote, red_seleccionada, metodos, 
-            resumen_total, folds_totales, historial_total, PARAMETROS_EXP
+            resumen_total, folds_totales, historial_total, predicciones_totales, PARAMETROS_EXP
         )
     
     print("\nPROCESO FINALIZADO.")

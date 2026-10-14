@@ -32,30 +32,8 @@ REGISTRO_FILE = os.path.join(
 
 
 # ============================================================
-# CRITERIOS EXPERIMENTALES
+# CRITERIOS EXPERIMENTALES ESENCIALES
 # ============================================================
-
-# ------------------------------------------------------------
-# PEQUEÑO
-# ------------------------------------------------------------
-
-SMALL_MAX_INSTANCES = 1000
-SMALL_MIN_FEATURES = 10
-SMALL_MAX_FEATURES = 20
-
-
-# ------------------------------------------------------------
-# MEDIANO
-# ------------------------------------------------------------
-
-MEDIUM_MIN_INSTANCES = 1001
-MEDIUM_MIN_FEATURES = 30
-MEDIUM_MAX_FEATURES = 50
-
-
-# ------------------------------------------------------------
-# CLASIFICACIÓN
-# ------------------------------------------------------------
 
 MIN_CLASSES = 2
 MIN_SAMPLES_PER_CLASS = 10
@@ -152,52 +130,6 @@ def detectar_marcadores_faltantes(df):
             )
 
     return encontrados
-
-
-def determinar_categoria(
-    n_instancias,
-    n_features
-):
-    """
-    Determina si el dataset pertenece a PEQUEÑO,
-    MEDIANO o queda fuera de los criterios.
-    """
-
-    # --------------------------------------------------------
-    # PEQUEÑO
-    # --------------------------------------------------------
-
-    if (
-        n_instancias <= SMALL_MAX_INSTANCES
-        and
-        SMALL_MIN_FEATURES
-        <= n_features
-        <= SMALL_MAX_FEATURES
-    ):
-
-        return "PEQUEÑO"
-
-
-    # --------------------------------------------------------
-    # MEDIANO
-    # --------------------------------------------------------
-
-    if (
-        n_instancias >= MEDIUM_MIN_INSTANCES
-        and
-        MEDIUM_MIN_FEATURES
-        <= n_features
-        <= MEDIUM_MAX_FEATURES
-    ):
-
-        return "MEDIANO"
-
-
-    # --------------------------------------------------------
-    # FUERA DE CRITERIO
-    # --------------------------------------------------------
-
-    return None
 
 
 def obtener_target_desde_uci(
@@ -380,7 +312,6 @@ def detectar_tarea_clasificacion(dataset, target=None):
     task_textos = []
 
     if metadata is not None:
-        # Revisar campos comunes en ucimlrepo donde se especifica la tarea
         candidatos_campos = ["associated_tasks", "task", "purpose"]
         for campo in candidatos_campos:
             valor = None
@@ -459,7 +390,6 @@ def cargar_registro():
         "Fecha_Evaluacion",
         "UCI_ID",
         "Dataset",
-        "Categoria",
         "Instancias",
         "Features",
         "Target",
@@ -537,7 +467,6 @@ def evaluar_dataset(
         "Fecha_Evaluacion": fecha,
         "UCI_ID": uci_id,
         "Dataset": "",
-        "Categoria": "",
         "Instancias": "",
         "Features": "",
         "Target": "",
@@ -596,16 +525,6 @@ def evaluar_dataset(
 
         print(e)
 
-        registro_base["Resultado"] = "ERROR"
-
-        registro_base["Motivo"] = (
-            f"No fue posible descargar el dataset: {e}"
-        )
-
-        guardar_registro(
-            registro_base
-        )
-
         return
 
 
@@ -657,16 +576,8 @@ def evaluar_dataset(
             f"\nNO APTO: {motivo}"
         )
 
-        registro_base["Resultado"] = (
-            "NO_APTO"
-        )
-
-        registro_base["Motivo"] = (
-            motivo
-        )
-
-        guardar_registro(
-            registro_base
+        print(
+            "\nEl dataset NO será guardado ni registrado."
         )
 
         return
@@ -710,23 +621,15 @@ def evaluar_dataset(
             f"\nNO APTO: {motivo}"
         )
 
-        registro_base["Resultado"] = (
-            "NO_APTO"
-        )
-
-        registro_base["Motivo"] = (
-            motivo
-        )
-
-        guardar_registro(
-            registro_base
+        print(
+            "\nEl dataset NO será guardado ni registrado."
         )
 
         return
 
 
     # ========================================================
-    # TAMAÑO
+    # TAMAÑO (Solo informativo para registro)
     # ========================================================
 
     n_instancias = len(X)
@@ -743,7 +646,7 @@ def evaluar_dataset(
 
 
     # ========================================================
-    # TAREA (CORREGIDO CON SOPORTE ASSOCIATED_TASKS Y TARGET)
+    # TAREA
     # ========================================================
 
     es_clasificacion = (
@@ -932,27 +835,6 @@ def evaluar_dataset(
 
 
     # ========================================================
-    # CATEGORÍA
-    # ========================================================
-
-    categoria = determinar_categoria(
-        n_instancias,
-        n_features
-    )
-
-
-    registro_base["Categoria"] = (
-
-        categoria
-
-        if categoria
-
-        else "FUERA_DE_CRITERIO"
-
-    )
-
-
-    # ========================================================
     # INFORMACIÓN GENERAL
     # ========================================================
 
@@ -1016,7 +898,7 @@ def evaluar_dataset(
     # --------------------------------------------------------
 
     print(
-        f"Clasificación        : "
+        f"Clasificación       : "
         f"{'OK' if es_clasificacion else 'NO'}"
     )
 
@@ -1030,57 +912,6 @@ def evaluar_dataset(
         else "NO"
 
     )
-
-
-    # --------------------------------------------------------
-    # CATEGORÍA
-    # --------------------------------------------------------
-
-    if categoria == "PEQUEÑO":
-
-        print(
-            "Categoría            : PEQUEÑO"
-        )
-
-        print(
-            f"Instancias           : OK "
-            f"(≤ {SMALL_MAX_INSTANCES})"
-        )
-
-        print(
-            f"Features             : OK "
-            f"({SMALL_MIN_FEATURES}-"
-            f"{SMALL_MAX_FEATURES})"
-        )
-
-
-    elif categoria == "MEDIANO":
-
-        print(
-            "Categoría            : MEDIANO"
-        )
-
-        print(
-            f"Instancias           : OK "
-            f"(> {SMALL_MAX_INSTANCES})"
-        )
-
-        print(
-            f"Features             : OK "
-            f"({MEDIUM_MIN_FEATURES}-"
-            f"{MEDIUM_MAX_FEATURES})"
-        )
-
-
-    else:
-
-        print(
-            "Categoría            : NO CUMPLE"
-        )
-
-        print(
-            "Instancias/Features  : NO"
-        )
 
 
     # --------------------------------------------------------
@@ -1213,7 +1044,7 @@ def evaluar_dataset(
 
 
     # ========================================================
-    # DECISIÓN FINAL
+    # DECISIÓN FINAL (Sin restricciones de instancias/features)
     # ========================================================
 
     motivos = []
@@ -1227,17 +1058,6 @@ def evaluar_dataset(
 
         motivos.append(
             "UCI no identifica el dataset como clasificación."
-        )
-
-
-    # --------------------------------------------------------
-    # Categoría
-    # --------------------------------------------------------
-
-    if categoria is None:
-
-        motivos.append(
-            "No cumple el rango de instancias/features."
         )
 
 
@@ -1324,10 +1144,6 @@ def evaluar_dataset(
             "RESULTADO: DATASET APTO"
         )
 
-        print(
-            f"CATEGORÍA: {categoria}"
-        )
-
 
         # ----------------------------------------------------
         # COPIA FEATURES
@@ -1376,7 +1192,7 @@ def evaluar_dataset(
 
 
         # ----------------------------------------------------
-        # Crear carpeta
+        # Crear carpeta de datos garantizada (CORREGIDO)
         # ----------------------------------------------------
 
         os.makedirs(
@@ -1403,7 +1219,7 @@ def evaluar_dataset(
 
 
         # ----------------------------------------------------
-        # Guardar
+        # Guardar CSV correctamente en D:\EXP_TINTO\Data
         # ----------------------------------------------------
 
         df_final.to_csv(
@@ -1421,7 +1237,7 @@ def evaluar_dataset(
         registro_base[
             "Motivo"
         ] = (
-            "Cumple todos los criterios establecidos."
+            "Cumple todos los criterios esenciales establecidos."
         )
 
 
@@ -1444,6 +1260,19 @@ def evaluar_dataset(
         print(
             f"\nTarget guardado: "
             f"{target_name_final}"
+        )
+
+        # GUARDAR EN EL REGISTRO ÚNICAMENTE SI ES APTO
+        guardar_registro(
+            registro_base
+        )
+
+        print(
+            "\nRegistro actualizado:"
+        )
+
+        print(
+            REGISTRO_FILE
         )
 
 
@@ -1471,39 +1300,8 @@ def evaluar_dataset(
 
 
         print(
-            "\nEl dataset NO será guardado "
-            "como candidato."
+            "\nEl dataset NO será guardado ni registrado."
         )
-
-
-        registro_base[
-            "Resultado"
-        ] = "NO_APTO"
-
-
-        registro_base[
-            "Motivo"
-        ] = " | ".join(
-            motivos
-        )
-
-
-    # ========================================================
-    # GUARDAR REGISTRO SIEMPRE
-    # ========================================================
-
-    guardar_registro(
-        registro_base
-    )
-
-
-    print(
-        "\nRegistro actualizado:"
-    )
-
-    print(
-        REGISTRO_FILE
-    )
 
 
     print(
@@ -1526,23 +1324,11 @@ def menu():
         )
 
         print(
-            "                SELECTOR DE DATASETS UCI"
+            "                    SELECTOR DE DATASETS UCI"
         )
 
         print(
             "=" * 75
-        )
-
-
-        print(
-            f"Pequeño : ≤ {SMALL_MAX_INSTANCES} instancias, "
-            f"{SMALL_MIN_FEATURES}-{SMALL_MAX_FEATURES} features"
-        )
-
-
-        print(
-            f"Mediano : > {SMALL_MAX_INSTANCES} instancias, "
-            f"{MEDIUM_MIN_FEATURES}-{MEDIUM_MAX_FEATURES} features"
         )
 
 

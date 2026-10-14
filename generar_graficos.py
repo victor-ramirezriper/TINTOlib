@@ -7,21 +7,25 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.metrics import confusion_matrix
 
 # ==========================================
-# CONFIGURACION Y DIRECTORIOS
+# CONFIGURACION Y DIRECTORIOS (Rutas corregidas)
 # ==========================================
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(r"D:\EXP_TINTO")
 
 RESULTS_DIR = BASE_DIR / "Results"
 BASE_ANALYSIS_DIR = BASE_DIR / "Analysis"
+REGISTRO_REGISTROS_PATH = BASE_DIR / "Data" / "Registro" / "registro_datasets.csv"
 
 MODELOS_BASELINE = [
     "Random_Forest",
     "SVM",
     "MLP_Clasico"
 ]
+
+# Los 11 metodos oficiales de TINTOlib
 METODOS_TINTO = [
     "TINTO",
     "IGTD",
@@ -32,7 +36,8 @@ METODOS_TINTO = [
     "SUPERTML",
     "FEATUREWRAP",
     "BIE",
-    "FOTOMICS"
+    "FOTOMICS",
+    "DEEPINSIGHT"
 ]
 
 ARQUITECTURAS_ESPERADAS = [
@@ -43,6 +48,9 @@ ARQUITECTURAS_ESPERADAS = [
 
 COLUMNAS_METRICAS = [
     "Accuracy",
+    "Balanced_Accuracy",
+    "Precision",
+    "Recall",
     "F1_Score",
     "ROC_AUC"
 ]
@@ -158,6 +166,29 @@ def leer_csv_seguro(ruta):
         return pd.DataFrame()
 
 
+def obtener_info_registro_dataset(nombre_dataset):
+    if not REGISTRO_REGISTROS_PATH.exists():
+        return None
+    try:
+        df_reg = pd.read_csv(REGISTRO_REGISTROS_PATH)
+        norm_obj = normalizar_dataset_clave(nombre_dataset)
+        for _, fila in df_reg.iterrows():
+            ds_reg = str(fila.get("Dataset", ""))
+            if normalizar_dataset_clave(ds_reg) == norm_obj or norm_obj in normalizar_dataset_clave(ds_reg):
+                inst = fila.get("Instancias", np.nan)
+                feat = fila.get("Features", np.nan)
+                clases = fila.get("Num_Clases", np.nan)
+                return {
+                    "Dataset": fila.get("Dataset", nombre_dataset),
+                    "Instancias": int(inst) if pd.notna(inst) and str(inst).replace('.','',1).isdigit() else "N/A",
+                    "Features": int(feat) if pd.notna(feat) and str(feat).replace('.','',1).isdigit() else "N/A",
+                    "Num_Clases": int(clases) if pd.notna(clases) and str(clases).replace('.','',1).isdigit() else "N/A"
+                }
+    except Exception:
+        pass
+    return None
+
+
 # ==========================================
 # IDENTIFICACION DE ARQUITECTURAS Y METODOS
 # ==========================================
@@ -245,6 +276,24 @@ def cargar_baseline(ruta):
         print("  Baseline vacio o no disponible.")
         return pd.DataFrame()
 
+    col_estrategia = buscar_columna(df, ["Estrategia", "Strategy"])
+    if col_estrategia is not None:
+        estrategias_disponibles = df[col_estrategia].astype(str).str.strip().str.upper().unique()
+        if "SMOTE" in estrategias_disponibles:
+            print("  -> Estrategia detectada: Se aplica filtro prioritario a SMOTE.")
+            df = df[df[col_estrategia].astype(str).str.strip().str.upper() == "SMOTE"].copy()
+        elif "ORIGINAL" in estrategias_disponibles:
+            print("  -> Estrategia detectada: Solo se encontro Original, cargando Original.")
+            df = df[df[col_estrategia].astype(str).str.strip().str.upper() == "ORIGINAL"].copy()
+
+    col_fold = buscar_columna(df, ["Fold_Actual", "Fold", "fold"])
+    if col_fold is not None:
+        df = df[df[col_fold].astype(str).str.contains("Fold", case=False, na=False)].copy()
+
+    if df.empty:
+        print("  No hay registros validos despues del filtrado de estrategia y folds.")
+        return pd.DataFrame()
+
     resultado = pd.DataFrame(index=df.index)
     resultado["Tipo"] = "Baseline"
 
@@ -255,9 +304,8 @@ def cargar_baseline(ruta):
     resultado["Metodo_TINTO"] = "BASELINE"
     resultado["Fold"] = obtener_columna_numerica(df, ["Fold_Actual", "Fold", "fold"])
     
-    # Normalización automática de escala (si está en 0-1, pasa a porcentaje 0-100)
     for metrica in COLUMNAS_METRICAS:
-        serie = obtener_columna_numerica(df, [metrica])
+        serie = obtener_columna_numerica(df, [metrica, f"Baseline_{metrica}", metrica.lower()])
         if serie.notna().any() and serie.max(skipna=True) <= 1.0:
             serie = serie * 100.0
         resultado[metrica] = serie
@@ -269,7 +317,7 @@ def cargar_baseline(ruta):
 
     resultado["RAM_GB"] = obtener_columna_numerica(df, ["RAM_GB", "Max_RAM_GB"])
     resultado["CPU_Usage_%"] = obtener_columna_numerica(df, ["CPU_Usage_%", "CPU_Usage", "Avg_CPU_Percent"])
-    resultado["VRAM_GB"] = obtener_columna_numerica(df, ["GPU_RAM_GB", "VRAM_GB", "Max_VRAM_GB"])
+    resultado["VRAM_GB"] = obtener_columna_numerica(df, ["Max_VRAM_GB", "VRAM_GB", "GPU_RAM_GB", "VRAM"])
     resultado["GPU_Usage_%"] = obtener_columna_numerica(df, ["GPU_Usage_%", "GPU_Usage", "Avg_GPU_Percent"])
 
     resultado["Fuente"] = str(ruta)
@@ -390,16 +438,36 @@ def cargar_resultados_folds(experimento):
     resultado["Fold"] = convertir_numerico(df[columna_fold]) if columna_fold is not None else np.arange(1, len(df) + 1)
     resultado["Modelo"] = resultado["Metodo_TINTO"].fillna("").astype(str)
 
-    for metrica in COLUMNAS_METRICAS:
-        resultado[metrica] = obtener_columna_numerica(df, [metrica])
+    resultado["Accuracy"] = obtener_columna_numerica(df, ["Accuracy", "Acc", "accuracy"])
+    resultado["F1_Score"] = obtener_columna_numerica(df, ["F1_Score", "F1", "f1_score"])
+    resultado["ROC_AUC"] = obtener_columna_numerica(df, ["ROC_AUC", "AUC", "roc_auc"])
+
+    bal_acc_col = buscar_columna(df, ["Balanced_Accuracy", "BalancedAcc", "Bal_Acc"])
+    if bal_acc_col is not None:
+        resultado["Balanced_Accuracy"] = obtener_columna_numerica(df, [bal_acc_col])
+    else:
+        resultado["Balanced_Accuracy"] = resultado["Accuracy"]
+
+    prec_col = buscar_columna(df, ["Precision", "Macro_Precision"])
+    if prec_col is not None:
+        resultado["Precision"] = obtener_columna_numerica(df, [prec_col])
+    else:
+        resultado["Precision"] = resultado["F1_Score"]
+
+    rec_col = buscar_columna(df, ["Recall", "Macro_Recall"])
+    if rec_col is not None:
+        resultado["Recall"] = obtener_columna_numerica(df, [rec_col])
+    else:
+        resultado["Recall"] = resultado["Balanced_Accuracy"]
 
     resultado["Tiempo_Transformacion_s"] = obtener_columna_numerica(df, ["Tiempo_Transformacion_s", "Tiempo_Transformacion", "Transform_Time_s"])
     resultado["Tiempo_Train_s"] = obtener_columna_numerica(df, ["Tiempo_Entrenamiento_s", "Tiempo_Train_s", "Training_Time_s"])
     resultado["Tiempo_Eval_s"] = obtener_columna_numerica(df, ["Tiempo_Evaluacion_s", "Tiempo_Eval_s", "Evaluation_Time_s"])
+    
     resultado["RAM_GB"] = obtener_columna_numerica(df, ["Max_RAM_GB", "RAM_GB"])
     resultado["CPU_Usage_%"] = obtener_columna_numerica(df, ["Avg_CPU_Percent", "CPU_Usage_%", "CPU_Usage"])
-    resultado["VRAM_GB"] = obtener_columna_numerica(df, ["Max_VRAM_GB", "VRAM_GB", "GPU_RAM_GB"])
-    resultado["GPU_Usage_%"] = obtener_columna_numerica(df, ["GPU_Usage_%", "GPU_Usage"])
+    resultado["VRAM_GB"] = obtener_columna_numerica(df, ["Max_VRAM_GB", "VRAM_GB", "GPU_RAM_GB", "VRAM"])
+    resultado["GPU_Usage_%"] = obtener_columna_numerica(df, ["GPU_Usage_%", "GPU_Usage", "Avg_GPU_Percent"])
 
     resultado["Tiempo_s"] = resultado["Tiempo_Train_s"] + resultado["Tiempo_Eval_s"]
     resultado["Fuente"] = str(ruta)
@@ -440,12 +508,37 @@ def cargar_historial_entrenamiento(experimento):
     return resultado
 
 
+def cargar_predicciones(experimento):
+    carpeta = experimento["carpeta"]
+    arquitectura = experimento["arquitectura"]
+    metodos_json = experimento["metodos"]
+
+    ruta = carpeta / "predicciones_folds.csv"
+    if not ruta.exists():
+        return pd.DataFrame()
+
+    df = leer_csv_seguro(ruta)
+    if df.empty:
+        return pd.DataFrame()
+
+    df["Arquitectura"] = arquitectura
+    columna_metodo = buscar_columna(df, ["Metodo", "Metodo_TINTO", "Method"])
+    if columna_metodo is not None:
+        df["Metodo_TINTO"] = df[columna_metodo].astype(str).apply(normalizar_metodo)
+    elif len(metodos_json) == 1:
+        df["Metodo_TINTO"] = metodos_json[0]
+    else:
+        df["Metodo_TINTO"] = np.nan
+
+    return df
+
+
 def cargar_deep_learning(dataset_seleccionado):
     experimentos = buscar_experimentos_deep_learning(dataset_seleccionado)
     if not experimentos:
-        return pd.DataFrame(), pd.DataFrame()
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
-    folds, historiales = [], []
+    folds, historiales, predicciones = [], [], []
 
     for experimento in experimentos:
         df_folds = cargar_resultados_folds(experimento)
@@ -456,17 +549,22 @@ def cargar_deep_learning(dataset_seleccionado):
         if not historial.empty:
             historiales.append(historial)
 
+        preds = cargar_predicciones(experimento)
+        if not preds.empty:
+            predicciones.append(preds)
+
     columnas_base = [
         "Tipo", "Arquitectura", "Metodo_TINTO", "Modelo", "Fold",
-        "Accuracy", "F1_Score", "ROC_AUC", "Tiempo_Transformacion_s", "Tiempo_Train_s",
-        "Tiempo_Eval_s", "Tiempo_s", "RAM_GB", "CPU_Usage_%",
-        "VRAM_GB", "GPU_Usage_%", "Fuente"
+        "Accuracy", "Balanced_Accuracy", "Precision", "Recall", "F1_Score", "ROC_AUC",
+        "Tiempo_Transformacion_s", "Tiempo_Train_s", "Tiempo_Eval_s", "Tiempo_s",
+        "RAM_GB", "CPU_Usage_%", "VRAM_GB", "GPU_Usage_%", "Fuente"
     ]
 
     df_folds = pd.concat(folds, ignore_index=True) if folds else pd.DataFrame(columns=columnas_base)
     df_historial = pd.concat(historiales, ignore_index=True) if historiales else pd.DataFrame()
+    df_predicciones = pd.concat(predicciones, ignore_index=True) if predicciones else pd.DataFrame()
 
-    return df_folds, df_historial
+    return df_folds, df_historial, df_predicciones
 
 
 def generar_resumen_desde_folds(df_folds):
@@ -474,9 +572,9 @@ def generar_resumen_desde_folds(df_folds):
         return pd.DataFrame()
 
     columnas_a_promediar = [
-        "Accuracy", "F1_Score", "ROC_AUC", "Tiempo_Transformacion_s", "Tiempo_Train_s",
-        "Tiempo_Eval_s", "Tiempo_s", "RAM_GB", "CPU_Usage_%",
-        "VRAM_GB", "GPU_Usage_%"
+        "Accuracy", "Balanced_Accuracy", "Precision", "Recall", "F1_Score", "ROC_AUC",
+        "Tiempo_Transformacion_s", "Tiempo_Train_s", "Tiempo_Eval_s", "Tiempo_s",
+        "RAM_GB", "CPU_Usage_%", "VRAM_GB", "GPU_Usage_%"
     ]
 
     disponibles = [col for col in columnas_a_promediar if col in df_folds.columns]
@@ -498,13 +596,12 @@ def generar_resumen_desde_folds(df_folds):
 
 
 # ==========================================
-# ESTRUCTURA DE 13 MODELOS Y ESCALA UNIFICADA
+# ESTRUCTURA DE 14 MODELOS
 # ==========================================
 
-def crear_estructura_13_modelos(df_base, df_dl, arquitectura):
+def crear_estructura_modelos(df_base, df_dl, arquitectura):
     filas = []
 
-    # 1. BASELINE (3 modelos tradicionales)
     if df_base is not None and not df_base.empty:
         for modelo in MODELOS_BASELINE:
             modelo_norm = normalizar_texto(modelo)
@@ -531,7 +628,6 @@ def crear_estructura_13_modelos(df_base, df_dl, arquitectura):
                 fila[columna] = np.nan
             filas.append(fila)
 
-    # 2. DEEP LEARNING (10 métodos TINTOlib)
     for metodo in METODOS_TINTO:
         fila = {
             "Tipo": "Deep Learning",
@@ -571,7 +667,216 @@ def normalizar_metricas_porcentaje(df):
 
 
 # ==========================================
-# FUNCIONES DE GRAFICADO CON ETIQUETAS EXPLÍCITAS
+# GENERACION DE TABLAS CSV Y VISUALES (IMAGEN)
+# ==========================================
+
+def generar_tablas_comparativas(df_modelos, arquitectura, output_dir_csv, output_dir_visual, dataset_nombre=""):
+    if df_modelos.empty:
+        return
+
+    columnas_tabla = {
+        "Modelo": "Metodo",
+        "F1_Score_pct": "F1-Score (%)",
+        "Accuracy_pct": "Acc. (%)",
+        "ROC_AUC_pct": "ROC-AUC (%)",
+        "VRAM_GB": "VRAM (GB)",
+        "Tiempo_s": "Tiempo Total (s)"
+    }
+
+    disponibles = [col for col in columnas_tabla.keys() if col in df_modelos.columns]
+    df_tabla = df_modelos[disponibles].rename(columns=columnas_tabla).copy()
+
+    for col in df_tabla.columns:
+        if col != "Metodo":
+            df_tabla[col] = pd.to_numeric(df_tabla[col], errors="coerce").round(3)
+
+    if "Acc. (%)" in df_tabla.columns:
+        df_tabla = df_tabla.sort_values(by="Acc. (%)", ascending=False).reset_index(drop=True)
+
+    prefijo = limpiar_nombre_archivo(arquitectura)
+    
+    ruta_csv = output_dir_csv / f"Tabla_Resultados_{prefijo}.csv"
+    df_tabla.to_csv(ruta_csv, index=False, encoding="utf-8-sig")
+    print(f"  -> Tabla CSV generada: {ruta_csv}")
+
+    col_accuracy = next(
+        (c for c in df_tabla.columns if c.strip().lower() in ["acc. (%)", "accuracy (%)", "accuracy_pct"]),
+        None
+    )
+
+    col_f1 = next(
+        (c for c in df_tabla.columns if c.strip().lower() in ["f1-score (%)", "f1_score (%)", "f1_score_pct"]),
+        None
+    )
+
+    max_accuracy = None
+    max_f1 = None
+    if col_accuracy is not None:
+        df_tabla[col_accuracy] = pd.to_numeric(df_tabla[col_accuracy], errors="coerce")
+        max_accuracy = df_tabla[col_accuracy].max()
+
+    if col_f1 is not None:
+        df_tabla[col_f1] = pd.to_numeric(df_tabla[col_f1], errors="coerce")
+        max_f1 = df_tabla[col_f1].max()
+
+    info_reg = obtener_info_registro_dataset(dataset_nombre)
+    if info_reg:
+        # Asegurando formato entero cerrado
+        inst_val = int(info_reg['Instancias']) if str(info_reg['Instancias']).isdigit() else info_reg['Instancias']
+        feat_val = int(info_reg['Features']) if str(info_reg['Features']).isdigit() else info_reg['Features']
+        clas_val = int(info_reg['Num_Clases']) if str(info_reg['Num_Clases']).isdigit() else info_reg['Num_Clases']
+        texto_info = (f"Dataset: {info_reg['Dataset']} | Instancias: {inst_val} | "
+                      f"Features: {feat_val} | Clases: {clas_val}")
+    else:
+        texto_info = f"Dataset: {dataset_nombre}"
+
+    fig, ax = plt.subplots(
+        figsize=(
+            max(10, len(df_tabla.columns) * 1.5),
+            max(3, len(df_tabla) * 0.6 + 2.5)
+        )
+    )
+
+    ax.axis("off")
+
+    plt.title("Mejores Modelos", fontsize=14, fontweight="bold", pad=15)
+
+    tabla = ax.table(
+        cellText=df_tabla.values,
+        colLabels=df_tabla.columns,
+        loc="center",
+        cellLoc="center"
+    )
+
+    tabla.auto_set_font_size(False)
+    tabla.set_fontsize(10)
+    tabla.scale(1, 1.5)
+
+    for col in range(len(df_tabla.columns)):
+        tabla[(0, col)].set_text_props(weight="bold")
+
+    if col_accuracy is not None and max_accuracy is not None:
+        indice_accuracy = df_tabla.columns.get_loc(col_accuracy)
+        for fila in range(len(df_tabla)):
+            if df_tabla.iloc[fila][col_accuracy] == max_accuracy:
+                tabla[(fila + 1, indice_accuracy)].set_text_props(weight="bold")
+
+    if col_f1 is not None and max_f1 is not None:
+        indice_f1 = df_tabla.columns.get_loc(col_f1)
+        for fila in range(len(df_tabla)):
+            if df_tabla.iloc[fila][col_f1] == max_f1:
+                tabla[(fila + 1, indice_f1)].set_text_props(weight="bold")
+
+    plt.figtext(
+        0.5, 0.02, texto_info,
+        wrap=True, horizontalalignment='center', fontsize=10, fontweight='bold',
+        bbox=dict(boxstyle='round,pad=0.5', facecolor='#f0f0f0', edgecolor='#d0d0d0')
+    )
+
+    ruta_imagen = output_dir_visual / f"Tabla_Visual_{prefijo}.png"
+
+    plt.savefig(
+        ruta_imagen,
+        dpi=300,
+        bbox_inches="tight",
+        pad_inches=0.3
+    )
+    plt.close()
+    print(f"  -> Tabla visual generada: {ruta_imagen}")
+
+
+# ==========================================
+# GENERACION DE TABLA RESUMEN GENERAL (MEJORES MODELOS GLOBALES)
+# ==========================================
+
+def generar_tabla_resumen_general():
+    print("\n" + "=" * 70)
+    print("GENERANDO RESUMEN GENERAL DE MEJORES MODELOS (Graficas_Generales)")
+    print("=" * 70)
+
+    baselines = buscar_baselines()
+    if not baselines:
+        print("No se encontraron baselines para resumir.")
+        return
+
+    resultados_globales = []
+
+    for baseline in baselines:
+        dataset_nombre = extraer_dataset_desde_baseline(baseline)
+        df_base = cargar_baseline(baseline)
+        df_dl, _, _ = cargar_deep_learning(dataset_nombre)
+
+        info_reg = obtener_info_registro_dataset(dataset_nombre)
+        instancias = int(info_reg.get("Instancias", 0)) if info_reg and str(info_reg.get("Instancias", "")).isdigit() else "N/A"
+        features = int(info_reg.get("Features", 0)) if info_reg and str(info_reg.get("Features", "")).isdigit() else "N/A"
+        num_clases = int(info_reg.get("Num_Clases", 0)) if info_reg and str(info_reg.get("Num_Clases", "")).isdigit() else "N/A"
+
+        arquitecturas_disponibles = df_dl["Arquitectura"].unique() if not df_dl.empty else ["Tabular"]
+        
+        for arch in arquitecturas_disponibles:
+            df_modelos = crear_estructura_modelos(df_base, df_dl, arch)
+            df_modelos = normalizar_metricas_porcentaje(df_modelos)
+
+            if df_modelos.empty:
+                continue
+
+            if "Accuracy_pct" in df_modelos.columns and df_modelos["Accuracy_pct"].notna().any():
+                mejor_idx = df_modelos["Accuracy_pct"].idxmax()
+                mejor_fila = df_modelos.loc[mejor_idx]
+
+                resultados_globales.append({
+                    "Dataset": dataset_nombre,
+                    "Arquitectura": arch,
+                    "Mejor_Modelo": mejor_fila.get("Modelo", "N/A"),
+                    "Accuracy_%": round(mejor_fila.get("Accuracy_pct", np.nan), 3),
+                    "F1_Score_%": round(mejor_fila.get("F1_Score_pct", np.nan), 3),
+                    "ROC_AUC_%": round(mejor_fila.get("ROC_AUC_pct", np.nan), 3),
+                    "Tiempo_Total_s": round(mejor_fila.get("Tiempo_s", np.nan), 3),
+                    "Instancias": instancias,
+                    "Features": features,
+                    "Num_Clases": num_clases
+                })
+
+    if not resultados_globales:
+        print("No se pudieron recopilar resultados para la tabla global.")
+        return
+
+    df_global = pd.DataFrame(resultados_globales)
+
+    df_global["Instancias_num"] = pd.to_numeric(df_global["Instancias"], errors="coerce")
+    df_global = df_global.sort_values(by="Instancias_num", ascending=True).drop(columns=["Instancias_num"]).reset_index(drop=True)
+
+    dir_generales = asegurar_directorio(RESULTS_DIR / "Graficas_Generales")
+    ruta_csv = dir_generales / "Resumen_Mejores_Modelos_Global.csv"
+    df_global.to_csv(ruta_csv, index=False, encoding="utf-8-sig")
+    print(f"-> CSV Resumen Global guardado en: {ruta_csv}")
+
+    fig, ax = plt.subplots(figsize=(14, max(4, len(df_global) * 0.5 + 2.0)))
+    ax.axis("off")
+    plt.title("Mejores Modelos - Resumen General por Dataset (Ordenado por Instancias)", fontsize=14, fontweight="bold", pad=15)
+
+    tabla = ax.table(
+        cellText=df_global.values,
+        colLabels=df_global.columns,
+        loc="center",
+        cellLoc="center"
+    )
+
+    tabla.auto_set_font_size(False)
+    tabla.set_fontsize(9)
+    tabla.scale(1, 1.4)
+
+    for col in range(len(df_global.columns)):
+        tabla[(0, col)].set_text_props(weight="bold")
+
+    ruta_imagen = dir_generales / "Resumen_Mejores_Modelos_Global.png"
+    plt.savefig(ruta_imagen, dpi=300, bbox_inches="tight", pad_inches=0.3)
+    plt.close()
+    print(f"-> Imagen Resumen Global guardada en: {ruta_imagen}")
+
+
+# ==========================================
+# FUNCIONES DE GRAFICADO CON UNIDADES ADECUADAS
 # ==========================================
 
 def generar_grafica_barras(df, columna, titulo, nombre_archivo, output_dir, y_label, porcentaje=False):
@@ -589,22 +894,38 @@ def generar_grafica_barras(df, columna, titulo, nombre_archivo, output_dir, y_la
         valores = valores * 100.0
 
     fig, ax = plt.subplots(figsize=(15, 8))
-    barras = ax.bar(x, valores)
+    
+    idx_max = np.argmax(valores)
+    idx_min = np.argmin(valores)
+    
+    colores = ["#4C72B0"] * len(valores)
+    if len(valores) > 0:
+        colores[idx_max] = "#2ca02c"
+        colores[idx_min] = "#d62728"
+
+    barras = ax.bar(x, valores, color=colores)
 
     ax.set_title(titulo, fontsize=15, fontweight="bold")
-    ax.set_xlabel("Modelos / Métodos Evaluados (Baseline y TINTOlib)", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Modelos y Metodos Evaluados", fontsize=12, fontweight="bold")
     ax.set_ylabel(y_label, fontsize=12, fontweight="bold")
     ax.set_xticks(x)
     ax.set_xticklabels(datos["Modelo"], rotation=45, ha="right", fontsize=10)
 
-    for barra, valor in zip(barras, valores):
+    for i, (barra, valor) in enumerate(zip(barras, valores)):
+        texto_extra = ""
+        if i == idx_max:
+            texto_extra = "\n(Mejor)"
+        elif i == idx_min:
+            texto_extra = "\n(Peor)"
+
         ax.text(
             barra.get_x() + barra.get_width() / 2,
             barra.get_height(),
-            f"{valor:.2f}",
+            f"{valor:.2f}{texto_extra}",
             ha="center",
             va="bottom",
-            fontsize=9
+            fontsize=8,
+            fontweight="bold" if (i == idx_max or i == idx_min) else "normal"
         )
 
     plt.tight_layout()
@@ -654,7 +975,7 @@ def generar_boxplot_folds(df, arquitectura, columna, titulo, nombre_archivo, out
     sns.stripplot(data=datos, x="Metodo_TINTO", y=columna, ax=ax, color="black", alpha=0.45, size=4)
 
     ax.set_title(titulo, fontsize=15, fontweight="bold")
-    ax.set_xlabel("Métodos TINTOlib (Variabilidad entre Folds)", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Metodos TINTOlib Evaluados por Folds", fontsize=12, fontweight="bold")
     ax.set_ylabel(y_label, fontsize=12, fontweight="bold")
     ax.tick_params(axis="x", rotation=45)
 
@@ -712,7 +1033,7 @@ def generar_grafica_ic95(df, arquitectura, columna, titulo, nombre_archivo, outp
     ax.set_xticks(x)
     ax.set_xticklabels(resumen["Metodo"], rotation=45, ha="right")
     ax.set_title(titulo, fontsize=15, fontweight="bold")
-    ax.set_xlabel("Métodos TINTOlib", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Metodos TINTOlib", fontsize=12, fontweight="bold")
     ax.set_ylabel(y_label, fontsize=12, fontweight="bold")
 
     plt.tight_layout()
@@ -817,7 +1138,7 @@ def generar_heatmap(df, columnas, titulo, nombre_archivo, output_dir, estandariz
         ax=ax
     )
     ax.set_title(titulo, fontsize=15, fontweight="bold")
-    ax.set_xlabel("Métricas y Recursos Evaluados", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Metricas y Recursos Evaluados", fontsize=12, fontweight="bold")
     ax.set_ylabel("Modelos Evaluados", fontsize=12, fontweight="bold")
     plt.tight_layout()
 
@@ -898,9 +1219,9 @@ def generar_graficas_historial(df_historial, output_dir):
                 ax.plot(agrupado["Epoch"], agrupado["Val_Media"], linewidth=3, linestyle="--", label="Validation Loss promedio")
                 ax.fill_between(agrupado["Epoch"], agrupado["Val_Media"] - agrupado["Val_STD"].fillna(0), agrupado["Val_Media"] + agrupado["Val_STD"].fillna(0), alpha=0.15)
 
-            ax.set_title(f"Curvas de pérdida - {arquitectura} - {metodo}", fontsize=15, fontweight="bold")
-            ax.set_xlabel("Épocas (Epoch)", fontsize=12, fontweight="bold")
-            ax.set_ylabel("Pérdida (Loss)", fontsize=12, fontweight="bold")
+            ax.set_title(f"Curvas de perdida de entrenamiento y validacion para {arquitectura} con {metodo}", fontsize=15, fontweight="bold")
+            ax.set_xlabel("Epocas de entrenamiento", fontsize=12, fontweight="bold")
+            ax.set_ylabel("Valor de perdida Loss", fontsize=12, fontweight="bold")
             ax.legend()
             plt.tight_layout()
 
@@ -908,6 +1229,40 @@ def generar_graficas_historial(df_historial, output_dir):
             plt.savefig(carpeta_loss / nombre, dpi=300, bbox_inches="tight")
             plt.close()
             print(f"  -> Grafica Loss: {carpeta_loss / nombre}")
+
+
+def generar_analisis_matrices_confusion(df_predicciones, output_dir):
+    if df_predicciones.empty or "y_true" not in df_predicciones.columns or "y_pred" not in df_predicciones.columns:
+        return
+
+    for arquitectura in sorted(df_predicciones["Arquitectura"].dropna().unique()):
+        arch_dir = asegurar_directorio(output_dir / limpiar_nombre_archivo(arquitectura))
+        subset_arch = df_predicciones[df_predicciones["Arquitectura"] == arquitectura]
+
+        for metodo in sorted(subset_arch["Metodo_TINTO"].dropna().unique()):
+            subset_met = subset_arch[subset_arch["Metodo_TINTO"] == metodo]
+            if subset_met.empty:
+                continue
+
+            y_true = subset_met["y_true"].values
+            y_pred = subset_met["y_pred"].values
+
+            if len(y_true) == 0:
+                continue
+
+            cm = confusion_matrix(y_true, y_pred)
+
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False, ax=ax)
+            ax.set_title(f"Matriz de Confusion - {arquitectura} ({metodo})", fontsize=14, fontweight="bold")
+            ax.set_xlabel("Etiqueta Predicha", fontsize=12, fontweight="bold")
+            ax.set_ylabel("Etiqueta Real", fontsize=12, fontweight="bold")
+            plt.tight_layout()
+
+            nombre_archivo = f"Matriz_Confusion_{limpiar_nombre_archivo(arquitectura)}_{limpiar_nombre_archivo(metodo)}.png"
+            plt.savefig(arch_dir / nombre_archivo, dpi=300, bbox_inches="tight")
+            plt.close()
+            print(f"  -> Matriz de confusion generada: {arch_dir / nombre_archivo}")
 
 
 def calcular_pruebas_estadisticas(df_folds):
@@ -968,11 +1323,11 @@ def generar_grafica_pvalues(df_pruebas, arquitectura, output_dir):
 
     fig, ax = plt.subplots(figsize=(13, 7))
     barras = ax.bar(datos["Metrica"], valores)
-    ax.axhline(-np.log10(0.05), linestyle="--", linewidth=2, label="p = 0.05 (Significativo)")
+    ax.axhline(-np.log10(0.05), linestyle="--", linewidth=2, label="Umbral p = 0.05 significativo")
 
-    ax.set_title(f"Prueba Kruskal-Wallis por métrica - {arquitectura}", fontsize=15, fontweight="bold")
-    ax.set_xlabel("Métrica Evaluada", fontsize=12, fontweight="bold")
-    ax.set_ylabel("-log10(p-value)", fontsize=12, fontweight="bold")
+    ax.set_title(f"Prueba estadistica Kruskal-Wallis por metrica para {arquitectura}", fontsize=15, fontweight="bold")
+    ax.set_xlabel("Metrica Evaluada", fontsize=12, fontweight="bold")
+    ax.set_ylabel("Valor -log10 de p-value", fontsize=12, fontweight="bold")
     ax.tick_params(axis="x", rotation=45)
 
     for barra, valor in zip(barras, valores):
@@ -990,58 +1345,59 @@ def generar_grafica_pvalues(df_pruebas, arquitectura, output_dir):
 # FLUJO DE GENERACION POR ARQUITECTURA
 # ==========================================
 
-def generar_graficas_comparativas(df_base, df_resumen, df_folds, arquitectura, output_dir):
+def generar_graficas_comparativas(df_base, df_resumen, df_folds, arquitectura, output_dir_comp, output_dir_tablas_csv, output_dir_tablas_visual, dataset_nombre=""):
     print(f"\n" + "-" * 70)
     print(f"Arquitectura: {arquitectura}")
 
-    df_13 = crear_estructura_13_modelos(df_base, df_resumen, arquitectura)
-    df_13 = normalizar_metricas_porcentaje(df_13)
-    print(f"Modelos incluidos: {len(df_13)}\n")
+    df_modelos = crear_estructura_modelos(df_base, df_resumen, arquitectura)
+    df_modelos = normalizar_metricas_porcentaje(df_modelos)
+    print(f"Modelos incluidos: {len(df_modelos)}\n")
 
     prefijo = limpiar_nombre_archivo(arquitectura)
 
-    # 1. Métricas con escala unificada (%)
+    generar_tablas_comparativas(df_modelos, arquitectura, output_dir_tablas_csv, output_dir_tablas_visual, dataset_nombre)
+
     for col, tit, nom in [
-        ("Accuracy_pct", f"Comparativa de Accuracy (%) - {arquitectura}", f"Comparativa_{prefijo}_Accuracy.png"),
-        ("F1_Score_pct", f"Comparativa de F1-Score Macro (%) - {arquitectura}", f"Comparativa_{prefijo}_F1_Score.png"),
-        ("ROC_AUC_pct", f"Comparativa de ROC-AUC (%) - {arquitectura}", f"Comparativa_{prefijo}_ROC_AUC.png")
+        ("Accuracy_pct", f"Comparativa de Accuracy porcentaje para {arquitectura}", f"Comparativa_{prefijo}_Accuracy.png"),
+        ("Balanced_Accuracy_pct", f"Comparativa de Balanced Accuracy porcentaje para {arquitectura}", f"Comparativa_{prefijo}_Balanced_Accuracy.png"),
+        ("Precision_pct", f"Comparativa de Precision porcentaje para {arquitectura}", f"Comparativa_{prefijo}_Precision.png"),
+        ("Recall_pct", f"Comparativa de Recall porcentaje para {arquitectura}", f"Comparativa_{prefijo}_Recall.png"),
+        ("F1_Score_pct", f"Comparativa de F1-Score porcentaje para {arquitectura}", f"Comparativa_{prefijo}_F1_Score.png"),
+        ("ROC_AUC_pct", f"Comparativa de ROC-AUC porcentaje para {arquitectura}", f"Comparativa_{prefijo}_ROC_AUC.png")
     ]:
-        generar_grafica_barras(df_13, col, tit, nom, output_dir, y_label="Porcentaje de Rendimiento (%)", porcentaje=False)
+        generar_grafica_barras(df_modelos, col, tit, nom, output_dir_comp, y_label="Porcentaje de Rendimiento (%)", porcentaje=False)
 
-    # 2. Tiempos (incluyendo Transformación)
+    # Gráficas de tiempo corregidas con unidades explícitas (segundos)
     for col, tit, nom in [
-        ("Tiempo_s", f"Tiempo total de procesamiento (s) - {arquitectura}", f"Comparativa_{prefijo}_Tiempo_Total.png"),
-        ("Tiempo_Transformacion_s", f"Tiempo de transformación TINTOlib (s) - {arquitectura}", f"Comparativa_{prefijo}_Tiempo_Transformacion.png"),
-        ("Tiempo_Train_s", f"Tiempo de entrenamiento (s) - {arquitectura}", f"Comparativa_{prefijo}_Tiempo_Train.png"),
-        ("Tiempo_Eval_s", f"Tiempo de evaluación (s) - {arquitectura}", f"Comparativa_{prefijo}_Tiempo_Eval.png")
+        ("Tiempo_s", f"Tiempo total de procesamiento en segundos para {arquitectura}", f"Comparativa_{prefijo}_Tiempo_Total.png"),
+        ("Tiempo_Transformacion_s", f"Tiempo de transformacion TINTOlib en segundos para {arquitectura}", f"Comparativa_{prefijo}_Tiempo_Transformacion.png"),
+        ("Tiempo_Train_s", f"Tiempo de entrenamiento en segundos para {arquitectura}", f"Comparativa_{prefijo}_Tiempo_Train.png"),
+        ("Tiempo_Eval_s", f"Tiempo de evaluacion en segundos para {arquitectura}", f"Comparativa_{prefijo}_Tiempo_Eval.png")
     ]:
-        generar_grafica_barras(df_13, col, tit, nom, output_dir, y_label="Tiempo (segundos)")
+        generar_grafica_barras(df_modelos, col, tit, nom, output_dir_comp, y_label="Tiempo Total (segundos)")
 
-    # 3. Recursos
     for col, tit, nom in [
-        ("RAM_GB", f"Uso de Memoria RAM (GB) - {arquitectura}", f"Comparativa_{prefijo}_RAM.png"),
-        ("CPU_Usage_%", f"Uso promedio de CPU (%) - {arquitectura}", f"Comparativa_{prefijo}_CPU.png"),
-        ("VRAM_GB", f"Uso de Memoria VRAM GPU (GB) - {arquitectura}", f"Comparativa_{prefijo}_VRAM.png"),
-        ("GPU_Usage_%", f"Uso promedio de GPU (%) - {arquitectura}", f"Comparativa_{prefijo}_GPU.png")
+        ("RAM_GB", f"Uso de Memoria RAM en Gigabytes para {arquitectura}", f"Comparativa_{prefijo}_RAM.png"),
+        ("CPU_Usage_%", f"Uso promedio de CPU en porcentaje para {arquitectura}", f"Comparativa_{prefijo}_CPU.png"),
+        ("VRAM_GB", f"Uso de Memoria VRAM de la GPU en Gigabytes para {arquitectura}", f"Comparativa_{prefijo}_VRAM.png"),
+        ("GPU_Usage_%", f"Uso promedio de la GPU en porcentaje para {arquitectura}", f"Comparativa_{prefijo}_GPU.png")
     ]:
-        generar_grafica_barras(df_13, col, tit, nom, output_dir, y_label="Consumo de Recursos")
+        generar_grafica_barras(df_modelos, col, tit, nom, output_dir_comp, y_label="Consumo de Recursos")
 
-    # 4. Scatters
-    generar_scatter(df_13, "Tiempo_s", "Accuracy_pct", f"Accuracy (%) vs Tiempo Total (s) - {arquitectura}", f"Scatter_{prefijo}_Accuracy_vs_Tiempo.png", output_dir, "Tiempo total de procesamiento (s)", "Accuracy (%)")
-    generar_scatter(df_13, "Tiempo_Transformacion_s", "Accuracy_pct", f"Accuracy (%) vs Tiempo de Transformación (s) - {arquitectura}", f"Scatter_{prefijo}_Accuracy_vs_Transformacion.png", output_dir, "Tiempo de transformación TINTOlib (s)", "Accuracy (%)")
-    generar_scatter(df_13, "RAM_GB", "Accuracy_pct", f"Accuracy (%) vs RAM (GB) - {arquitectura}", f"Scatter_{prefijo}_Accuracy_vs_RAM.png", output_dir, "Memoria RAM (GB)", "Accuracy (%)")
+    generar_scatter(df_modelos, "Tiempo_s", "Accuracy_pct", f"Accuracy porcentaje contra Tiempo Total de procesamiento para {arquitectura}", f"Scatter_{prefijo}_Accuracy_vs_Tiempo.png", output_dir_comp, "Tiempo total de procesamiento (segundos)", "Accuracy (%)")
+    generar_scatter(df_modelos, "Tiempo_Transformacion_s", "Accuracy_pct", f"Accuracy porcentaje contra Tiempo de Transformacion para {arquitectura}", f"Scatter_{prefijo}_Accuracy_vs_Transformacion.png", output_dir_comp, "Tiempo de transformacion TINTOlib (segundos)", "Accuracy (%)")
+    generar_scatter(df_modelos, "RAM_GB", "Accuracy_pct", f"Accuracy porcentaje contra Memoria RAM consumida para {arquitectura}", f"Scatter_{prefijo}_Accuracy_vs_RAM.png", output_dir_comp, "Memoria RAM (GB)", "Accuracy (%)")
 
-    # 5. Heatmap
     generar_heatmap(
-        df_13,
-        ["Accuracy_pct", "F1_Score_pct", "ROC_AUC_pct", "Tiempo_Transformacion_s", "Tiempo_s", "RAM_GB", "CPU_Usage_%", "VRAM_GB"],
-        f"Mapa comparativo estandarizado de métricas y recursos - {arquitectura}",
+        df_modelos,
+        ["Accuracy_pct", "Balanced_Accuracy_pct", "Precision_pct", "Recall_pct", "F1_Score_pct", "ROC_AUC_pct", "Tiempo_Transformacion_s", "Tiempo_s", "RAM_GB", "CPU_Usage_%", "VRAM_GB"],
+        f"Mapa comparativo estandarizado de metricas y recursos para {arquitectura}",
         f"Heatmap_{prefijo}.png",
-        output_dir,
+        output_dir_comp,
         estandarizar=True
     )
 
-    return df_13
+    return df_modelos
 
 
 def generar_analisis_folds(df_folds, output_dir):
@@ -1051,19 +1407,21 @@ def generar_analisis_folds(df_folds, output_dir):
     for arquitectura in sorted(df_folds["Arquitectura"].dropna().unique()):
         prefijo = limpiar_nombre_archivo(arquitectura)
         for col, tit, nom, ylbl in [
-            ("Accuracy", f"Variabilidad de Accuracy por Fold - {arquitectura}", f"Boxplot_{prefijo}_Accuracy_Folds.png", "Accuracy (%)"),
-            ("F1_Score", f"Variabilidad de F1-Score por Fold - {arquitectura}", f"Boxplot_{prefijo}_F1_Folds.png", "F1-Score Macro (%)"),
-            ("ROC_AUC", f"Variabilidad de ROC-AUC por Fold - {arquitectura}", f"Boxplot_{prefijo}_ROC_AUC_Folds.png", "ROC-AUC (%)"),
-            ("Tiempo_Transformacion_s", f"Variabilidad de Tiempo de Transformación por Fold - {arquitectura}", f"Boxplot_{prefijo}_Tiempo_Transformacion_Folds.png", "Tiempo de Transformación (s)")
+            ("Accuracy", f"Variabilidad de Accuracy por Folds para {arquitectura}", f"Boxplot_{prefijo}_Accuracy_Folds.png", "Accuracy (%)"),
+            ("Balanced_Accuracy", f"Variabilidad de Balanced Accuracy por Folds para {arquitectura}", f"Boxplot_{prefijo}_Balanced_Accuracy_Folds.png", "Balanced Accuracy (%)"),
+            ("Precision", f"Variabilidad de Precision por Folds para {arquitectura}", f"Boxplot_{prefijo}_Precision_Folds.png", "Precision (%)"),
+            ("Recall", f"Variabilidad de Recall por Folds para {arquitectura}", f"Boxplot_{prefijo}_Recall_Folds.png", "Recall (%)"),
+            ("F1_Score", f"Variabilidad de F1-Score por Folds para {arquitectura}", f"Boxplot_{prefijo}_F1_Folds.png", "F1-Score Macro (%)"),
+            ("ROC_AUC", f"Variabilidad de ROC-AUC por Folds para {arquitectura}", f"Boxplot_{prefijo}_ROC_AUC_Folds.png", "ROC-AUC (%)"),
+            ("Tiempo_Transformacion_s", f"Variabilidad de Tiempo de Transformacion por Folds para {arquitectura}", f"Boxplot_{prefijo}_Tiempo_Transformacion_Folds.png", "Tiempo de Transformacion (segundos)")
         ]:
-            # Normalizar folds de accuracy a porcentaje si están en 0-1
             datos_temp = df_folds.copy()
             if col in COLUMNAS_METRICAS and datos_temp[col].max(skipna=True) <= 1.0:
                 datos_temp[col] = datos_temp[col] * 100.0
                 ylbl = f"{col} (%)"
 
             generar_boxplot_folds(datos_temp, arquitectura, col, tit, nom, output_dir, y_label=ylbl)
-            generar_grafica_ic95(datos_temp, arquitectura, col, f"Media e IC95 - {col} - {arquitectura}", f"IC95_{prefijo}_{col}.png", output_dir, y_label=ylbl)
+            generar_grafica_ic95(datos_temp, arquitectura, col, f"Media e intervalo de confianza del 95 por ciento para {col} en {arquitectura}", f"IC95_{prefijo}_{col}.png", output_dir, y_label=ylbl)
 
 
 def generar_analisis_arquitecturas(df_resumen, output_dir):
@@ -1084,9 +1442,10 @@ def generar_analisis_arquitecturas(df_resumen, output_dir):
 
         fig, ax = plt.subplots(figsize=(16, 9))
         sns.barplot(data=datos, x="Metodo_TINTO", y=columna, hue="Arquitectura", ax=ax)
-        ax.set_title(f"Comparación entre arquitecturas de Deep Learning - {columna}", fontsize=15, fontweight="bold")
-        ax.set_xlabel("Métodos TINTOlib", fontsize=12, fontweight="bold")
-        ax.set_ylabel(columna, fontsize=12, fontweight="bold")
+        ax.set_title(f"Comparacion entre arquitecturas de Deep Learning para la metrica {columna}", fontsize=15, fontweight="bold")
+        ax.set_xlabel("Metodos TINTOlib", fontsize=12, fontweight="bold")
+        ylbl = f"{columna} (segundos)" if "Tiempo" in columna else columna
+        ax.set_ylabel(ylbl, fontsize=12, fontweight="bold")
         ax.tick_params(axis="x", rotation=45)
         plt.tight_layout()
 
@@ -1108,6 +1467,8 @@ def main():
     if not RESULTS_DIR.exists():
         print(f"\nNo existe la carpeta Results:\n  {RESULTS_DIR}")
         return
+
+    generar_tabla_resumen_general() 
 
     baselines = buscar_baselines()
     if not baselines:
@@ -1136,34 +1497,30 @@ def main():
 
     print(f"\nDataset seleccionado: {dataset_seleccionado}")
 
-    # ==========================================
-    # CREAR ESTRUCTURA DE SUBCARPETAS ORGANIZADAS
-    # ==========================================
     nombre_muestra_limpio = limpiar_nombre_archivo(dataset_seleccionado)
     dir_dataset = BASE_ANALYSIS_DIR / nombre_muestra_limpio
 
     dir_comparativas = asegurar_directorio(dir_dataset / "Comparativas")
+    dir_tablas = asegurar_directorio(dir_dataset / "Tablas")
+    dir_tablas_visuales = asegurar_directorio(dir_dataset / "Tablas_Visuales")
     dir_folds = asegurar_directorio(dir_dataset / "Folds")
     dir_arquitecturas = asegurar_directorio(dir_dataset / "Arquitecturas")
     dir_loss = asegurar_directorio(dir_dataset / "Loss")
     dir_estadisticas = asegurar_directorio(dir_dataset / "Estadisticas")
+    dir_matrices = asegurar_directorio(dir_dataset / "Matrices_Confusion")
     dir_csvs = asegurar_directorio(dir_dataset / "CSVs")
 
-    # CARGAR DATOS
     df_base = cargar_baseline(baseline_path)
-    df_folds, df_historial = cargar_deep_learning(dataset_seleccionado)
+    df_folds, df_historial, df_predicciones = cargar_deep_learning(dataset_seleccionado)
 
-    # RECONSTRUIR EL RESUMEN EXCLUSIVAMENTE DESDE LOS FOLDS
     df_resumen = generar_resumen_desde_folds(df_folds)
 
-    # NORMALIZAR COLUMNAS NUMÉRICAS
     for df_target in [df_resumen, df_folds]:
         if not df_target.empty:
             for col in (COLUMNAS_METRICAS + COLUMNAS_TIEMPO + COLUMNAS_RECURSOS):
                 if col in df_target.columns:
                     df_target[col] = convertir_numerico(df_target[col])
 
-    # DETECTAR ARQUITECTURAS
     arquitecturas = []
     if not df_resumen.empty:
         arquitecturas.extend(df_resumen["Arquitectura"].dropna().unique().tolist())
@@ -1176,12 +1533,14 @@ def main():
             if a not in arquitecturas:
                 arquitecturas.append(a)
 
-    # GENERAR COMPARATIVAS Y GUARDAR EN SUBCARPETAS
     for arquitectura in arquitecturas:
-        generar_graficas_comparativas(df_base, df_resumen, df_folds, arquitectura, dir_comparativas)
+        generar_graficas_comparativas(df_base, df_resumen, df_folds, arquitectura, dir_comparativas, dir_tablas, dir_tablas_visuales, dataset_seleccionado)
 
     if not df_folds.empty:
         generar_analisis_folds(df_folds, dir_folds)
+
+    if not df_predicciones.empty:
+        generar_analisis_matrices_confusion(df_predicciones, dir_matrices)
 
     if not df_resumen.empty:
         generar_analisis_arquitecturas(df_resumen, dir_arquitecturas)
@@ -1190,7 +1549,6 @@ def main():
         df_historial.to_csv(dir_csvs / "Historial_Loss_Unificado.csv", index=False, encoding="utf-8-sig")
         generar_graficas_historial(df_historial, dir_loss)
 
-    # ESTADISTICAS Y PRUEBAS (CON ANÁLISIS DE VARIABILIDAD ENTRE FOLDS)
     stats_folds = calcular_estadisticas_folds(df_folds)
     if not stats_folds.empty:
         stats_folds.to_csv(dir_csvs / "Estadisticas_Folds.csv", index=False, encoding="utf-8-sig")
@@ -1205,19 +1563,17 @@ def main():
         for arquitectura in sorted(pruebas["Arquitectura"].dropna().unique()):
             generar_grafica_pvalues(pruebas, arquitectura, dir_estadisticas)
 
-    # CORRELACION GLOBAL
     if not df_resumen.empty:
         corr = generar_correlacion(
             df_resumen,
             COLUMNAS_METRICAS + COLUMNAS_TIEMPO + COLUMNAS_RECURSOS,
-            "Correlación global entre métricas, tiempos de transformación/entrenamiento y recursos",
+            "Correlacion global entre metricas de rendimiento y recursos del sistema",
             "Correlacion_Global.png",
             dir_estadisticas
         )
         if corr is not None:
             corr.to_csv(dir_csvs / "Matriz_Correlacion.csv", encoding="utf-8-sig")
 
-    # CSVs UNIFICADOS POR MUESTRA
     if not df_folds.empty:
         df_folds.to_csv(dir_csvs / "Resultados_Folds_Unificados.csv", index=False, encoding="utf-8-sig")
 

@@ -109,8 +109,8 @@ def crear_modelo(metodo, numero_features):
         return REFINED(
            problem=PROBLEM,
            hcIterations=1,
-          # n_processors=obtener_numero_procesadores(), # Ajuste dinámico de CPU
-           n_processors=8,
+           n_processors=obtener_numero_procesadores(), # Ajuste dinámico de CPU
+           #n_processors=8,
            random_seed=SEED,
            verbose=True
         )

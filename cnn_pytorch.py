@@ -21,7 +21,7 @@ from src.project_config import IMAGE_DIR, RESULTS_DIR
 
 warnings.filterwarnings("ignore")
 
-BATCH_SIZE = 8
+BATCH_SIZE = 32
 LEARNING_RATE = 0.001
 DEFAULT_EPOCHS = 15
 SEED = 1
