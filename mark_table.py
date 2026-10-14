@@ -1,35 +1,29 @@
+
 from pathlib import Path
 import re
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from src.project_config import (
+    PROJECT_ROOT,
+    DATA_DIR,
+    RESULTS_DIR,
+    ANALYSIS_DIR,
+    preparar_directorios,
+)
 
-# ============================================================
-# CONFIGURACIÓN
-# ============================================================
-
-BASE_DIR = Path(r"D:\EXP_TINTO")
-
-ANALYSIS_DIR = BASE_DIR / "Analysis"
+BASE_DIR = PROJECT_ROOT
+ANALYSIS_DIR = ANALYSIS_DIR
 
 REGISTRO_PATH = (
-    BASE_DIR
-    / "Data"
-    / "Registro"
-    / "registro_datasets.csv"
+    DATA_DIR / "Registro" / "registro_datasets.csv"
 )
 
-SALIDA_DIR = (
-    BASE_DIR
-    / "Results"
-    / "Graficas_Generales"
-)
+SALIDA_DIR = RESULTS_DIR / "Graficas_Generales"
+      
 
-
-# ============================================================
 # LOS 14 MÉTODOS VÁLIDOS
-# ============================================================
 
 METODOS_VALIDOS = [
 

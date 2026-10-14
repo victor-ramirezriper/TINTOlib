@@ -13,22 +13,15 @@ except ImportError:
     print("pip install ucimlrepo")
     raise SystemExit
 
+from pathlib import Path
+import re
+from datetime import datetime
 
-# ============================================================
-# CONFIGURACIÓN
-# ============================================================
+import pandas as pd
+from src.project_config import DATA_DIR, preparar_directorios
 
-DATA_DIR = r"D:\EXP_TINTO\Data"
-
-REGISTRO_DIR = os.path.join(
-    DATA_DIR,
-    "Registro"
-)
-
-REGISTRO_FILE = os.path.join(
-    REGISTRO_DIR,
-    "registro_datasets.csv"
-)
+REGISTRO_DIR = DATA_DIR / "Registro"
+REGISTRO_FILE = REGISTRO_DIR / "registro_datasets.csv"
 
 
 # ============================================================

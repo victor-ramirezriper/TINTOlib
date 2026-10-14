@@ -1,3 +1,4 @@
+
 from pathlib import Path
 import json
 import re
@@ -9,23 +10,39 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
+from src.project_config import (
+    PROJECT_ROOT,
+    DATA_DIR,
+    RESULTS_DIR,
+    ANALYSIS_DIR,
+    preparar_directorios,
+)
+
 # ==========================================
-# CONFIGURACION Y DIRECTORIOS (Rutas corregidas)
+# CONFIGURACIÓN Y DIRECTORIOS DINÁMICOS
 # ==========================================
 
-BASE_DIR = Path(r"D:\EXP_TINTO")
+BASE_DIR = PROJECT_ROOT
+BASE_ANALYSIS_DIR = ANALYSIS_DIR
 
-RESULTS_DIR = BASE_DIR / "Results"
-BASE_ANALYSIS_DIR = BASE_DIR / "Analysis"
-REGISTRO_REGISTROS_PATH = BASE_DIR / "Data" / "Registro" / "registro_datasets.csv"
+REGISTRO_REGISTROS_PATH = (
+    DATA_DIR / "Registro" / "registro_datasets.csv"
+)
+
+# Crear directorios de trabajo si no existen
+preparar_directorios()
+
+# ==========================================
+# MODELOS Y MÉTODOS
+# ==========================================
 
 MODELOS_BASELINE = [
     "Random_Forest",
     "SVM",
-    "MLP_Clasico"
+    "MLP_Clasico",
 ]
 
-# Los 11 metodos oficiales de TINTOlib
+# Los 11 métodos de TINTOlib
 METODOS_TINTO = [
     "TINTO",
     "IGTD",
@@ -37,13 +54,13 @@ METODOS_TINTO = [
     "FEATUREWRAP",
     "BIE",
     "FOTOMICS",
-    "DEEPINSIGHT"
+    "DEEPINSIGHT",
 ]
 
 ARQUITECTURAS_ESPERADAS = [
     "ResNet18",
     "EfficientNet-B0",
-    "ViT"
+    "ViT",
 ]
 
 COLUMNAS_METRICAS = [
@@ -52,21 +69,21 @@ COLUMNAS_METRICAS = [
     "Precision",
     "Recall",
     "F1_Score",
-    "ROC_AUC"
+    "ROC_AUC",
 ]
 
 COLUMNAS_TIEMPO = [
     "Tiempo_Transformacion_s",
     "Tiempo_Train_s",
     "Tiempo_Eval_s",
-    "Tiempo_s"
+    "Tiempo_s",
 ]
 
 COLUMNAS_RECURSOS = [
     "RAM_GB",
     "CPU_Usage_%",
     "VRAM_GB",
-    "GPU_Usage_%"
+    "GPU_Usage_%",
 ]
 
 warnings.filterwarnings("ignore")

@@ -1,75 +1,98 @@
+
+import os
 from pathlib import Path
 
 
 def encontrar_raiz_proyecto():
     """
-    Busca la raíz del proyecto a partir de la ubicación de este archivo.
+    Localiza la raíz del repositorio en Windows, Linux o Colab.
 
-    Se considera válida una carpeta que contenga:
-    - src
-    - Data
-    - Image
+    También permite definir una ubicación personalizada mediante
+    la variable de entorno TINTO_PROJECT_ROOT.
     """
-    carpeta_actual = Path(__file__).resolve().parent
+    raiz_configurada = os.environ.get("TINTO_PROJECT_ROOT")
 
-    for carpeta in [carpeta_actual, *carpeta_actual.parents]:
+    if raiz_configurada:
+        raiz = Path(raiz_configurada).expanduser().resolve()
+
+        if (raiz / "src").is_dir() and (raiz / "main.py").is_file():
+            return raiz
+
+        raise FileNotFoundError(
+            f"TINTO_PROJECT_ROOT no apunta a un proyecto válido: {raiz}"
+        )
+
+    archivo_actual = Path(__file__).resolve()
+
+    for carpeta in archivo_actual.parents:
         if (
             (carpeta / "src").is_dir()
-            and (carpeta / "Data").is_dir()
-            and (carpeta / "Image").is_dir()
+            and (carpeta / "main.py").is_file()
         ):
             return carpeta
 
     raise FileNotFoundError(
-        "No fue posible localizar la raíz del proyecto.\n"
-        "Se esperaba encontrar las carpetas 'src', 'Data' e 'Image'."
+        "No se encontró la raíz de TINTOlib. "
+        "Verifica que el repositorio contenga main.py y src/."
     )
 
-
-# ============================================================
-# RUTAS PRINCIPALES DEL PROYECTO
-# ============================================================
 
 PROJECT_ROOT = encontrar_raiz_proyecto()
 
 DATA_DIR = PROJECT_ROOT / "Data"
 IMAGE_DIR = PROJECT_ROOT / "Image"
 RESULTS_DIR = PROJECT_ROOT / "Results"
+ANALYSIS_DIR = PROJECT_ROOT / "Analysis"
 SRC_DIR = PROJECT_ROOT / "src"
 
 
 def preparar_directorios():
-    """
-    Comprueba y crea los directorios que pueden faltar.
-    """
-    IMAGE_DIR.mkdir(exist_ok=True)
-    RESULTS_DIR.mkdir(exist_ok=True)
+    """Crea las carpetas de trabajo que no existan."""
+    for ruta in (
+        DATA_DIR,
+        IMAGE_DIR,
+        RESULTS_DIR,
+        ANALYSIS_DIR,
+    ):
+        ruta.mkdir(parents=True, exist_ok=True)
 
 
 def obtener_ruta_dataset(nombre_archivo):
-    """
-    Devuelve la ruta completa de un dataset ubicado en Data/.
-    """
-    ruta = DATA_DIR / nombre_archivo
+    """Obtiene y valida la ruta de un CSV de Data/."""
+    ruta = Path(nombre_archivo).expanduser()
+
+    # Acepta tanto un nombre de archivo como una ruta explícita.
+    if not ruta.is_absolute():
+        ruta = DATA_DIR / ruta
+
+    ruta = ruta.resolve()
 
     if not ruta.is_file():
         raise FileNotFoundError(
-            f"No se encontró el dataset:\n{ruta}"
+            f"No se encontró el dataset:\n{ruta}\n"
+            f"Carpeta de datos configurada: {DATA_DIR}"
         )
+
+    if ruta.suffix.lower() != ".csv":
+        raise ValueError(f"Se esperaba un archivo CSV: {ruta}")
 
     return ruta
 
 
 def mostrar_configuracion():
-    """
-    Muestra las rutas detectadas del proyecto.
-    """
+    """Imprime las rutas detectadas."""
     print("=" * 60)
     print("CONFIGURACIÓN DEL PROYECTO")
     print("=" * 60)
-    print(f"Raíz del proyecto : {PROJECT_ROOT}")
-    print(f"Datasets          : {DATA_DIR}")
-    print(f"Imágenes          : {IMAGE_DIR}")
-    print(f"Resultados        : {RESULTS_DIR}")
-    print(f"Código fuente     : {SRC_DIR}")
+    print(f"Raíz       : {PROJECT_ROOT}")
+    print(f"Datasets   : {DATA_DIR}")
+    print(f"Imágenes   : {IMAGE_DIR}")
+    print(f"Resultados : {RESULTS_DIR}")
+    print(f"Análisis   : {ANALYSIS_DIR}")
+    print(f"Código     : {SRC_DIR}")
     print("=" * 60)
+
+
+if __name__ == "__main__":
+    preparar_directorios()
+    mostrar_configuracion()
