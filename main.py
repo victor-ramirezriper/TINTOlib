@@ -43,18 +43,18 @@ def menu_interactivo():
     target_col = columnas[opcion_tg]
 
     metodos = [
-        "tinto", "igtd", "bargraph", "distancematrix", 
+        "tinto", "igtd","refined" ,"bargraph", "distancematrix", 
         "combination", "supertml", "featurewrap", "bie", "fotomics", "deepinsight"
     ]
     
     print("\nMétodos de transformación disponibles:")
     for i, met in enumerate(metodos, 1):
         print(f"  {i}. {met.upper()}")
-    print("  11. TODOS LOS MÉTODOS (Ejecución en lote)")
+    print("  12. TODOS LOS MÉTODOS (Ejecución en lote)")
         
     opcion_met = int(input("\nSelecciona el número del método a ejecutar: "))
     
-    if opcion_met == 11:
+    if opcion_met == 12:
         metodos_seleccionados = metodos
     else:
         metodos_seleccionados = [metodos[opcion_met - 1]]

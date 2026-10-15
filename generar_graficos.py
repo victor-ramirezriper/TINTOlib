@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import json
 import re
@@ -738,7 +737,6 @@ def generar_tablas_comparativas(df_modelos, arquitectura, output_dir_csv, output
 
     info_reg = obtener_info_registro_dataset(dataset_nombre)
     if info_reg:
-        # Asegurando formato entero cerrado
         inst_val = int(info_reg['Instancias']) if str(info_reg['Instancias']).isdigit() else info_reg['Instancias']
         feat_val = int(info_reg['Features']) if str(info_reg['Features']).isdigit() else info_reg['Features']
         clas_val = int(info_reg['Num_Clases']) if str(info_reg['Num_Clases']).isdigit() else info_reg['Num_Clases']
@@ -769,8 +767,11 @@ def generar_tablas_comparativas(df_modelos, arquitectura, output_dir_csv, output
     tabla.set_fontsize(10)
     tabla.scale(1, 1.5)
 
-    for col in range(len(df_tabla.columns)):
-        tabla[(0, col)].set_text_props(weight="bold")
+    for (row, col), cell in tabla.get_celld().items():
+        cell.set_edgecolor("black")
+        cell.set_linewidth(1.5)
+        if row == 0:
+            cell.set_text_props(weight="bold")
 
     if col_accuracy is not None and max_accuracy is not None:
         indice_accuracy = df_tabla.columns.get_loc(col_accuracy)
@@ -786,8 +787,8 @@ def generar_tablas_comparativas(df_modelos, arquitectura, output_dir_csv, output
 
     plt.figtext(
         0.5, 0.02, texto_info,
-        wrap=True, horizontalalignment='center', fontsize=10, fontweight='bold',
-        bbox=dict(boxstyle='round,pad=0.5', facecolor='#f0f0f0', edgecolor='#d0d0d0')
+        wrap=True, horizontalalignment='center', fontsize=11, fontweight='bold',
+        bbox=dict(boxstyle='round,pad=0.5', facecolor='#f0f0f0', edgecolor='black', linewidth=2)
     )
 
     ruta_imagen = output_dir_visual / f"Tabla_Visual_{prefijo}.png"
@@ -883,8 +884,11 @@ def generar_tabla_resumen_general():
     tabla.set_fontsize(9)
     tabla.scale(1, 1.4)
 
-    for col in range(len(df_global.columns)):
-        tabla[(0, col)].set_text_props(weight="bold")
+    for (row, col), cell in tabla.get_celld().items():
+        cell.set_edgecolor("black")
+        cell.set_linewidth(1.5)
+        if row == 0:
+            cell.set_text_props(weight="bold")
 
     ruta_imagen = dir_generales / "Resumen_Mejores_Modelos_Global.png"
     plt.savefig(ruta_imagen, dpi=300, bbox_inches="tight", pad_inches=0.3)
@@ -904,35 +908,40 @@ def generar_grafica_barras(df, columna, titulo, nombre_archivo, output_dir, y_la
     if datos.empty:
         return
 
+    es_tiempo_recurso = any(c in columna for c in COLUMNAS_TIEMPO + COLUMNAS_RECURSOS)
+    
+    if es_tiempo_recurso:
+        datos = datos.sort_values(by=columna, ascending=True).reset_index(drop=True)
+    else:
+        datos = datos.sort_values(by=columna, ascending=False).reset_index(drop=True)
+
     x = np.arange(len(datos))
     valores = datos[columna].astype(float).values
+    modelos = datos["Modelo"].values
 
     if porcentaje and np.nanmax(np.abs(valores)) <= 1.0:
         valores = valores * 100.0
 
     fig, ax = plt.subplots(figsize=(15, 8))
     
-    idx_max = np.argmax(valores)
-    idx_min = np.argmin(valores)
-    
     colores = ["#4C72B0"] * len(valores)
     if len(valores) > 0:
-        colores[idx_max] = "#2ca02c"
-        colores[idx_min] = "#d62728"
+        colores[0] = "#2ca02c"
+        colores[-1] = "#d62728"
 
-    barras = ax.bar(x, valores, color=colores)
+    barras = ax.bar(x, valores, color=colores, edgecolor='black', linewidth=1)
 
     ax.set_title(titulo, fontsize=15, fontweight="bold")
-    ax.set_xlabel("Modelos y Metodos Evaluados", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Modelos y Métodos Evaluados", fontsize=12, fontweight="bold")
     ax.set_ylabel(y_label, fontsize=12, fontweight="bold")
     ax.set_xticks(x)
-    ax.set_xticklabels(datos["Modelo"], rotation=45, ha="right", fontsize=10)
+    ax.set_xticklabels(modelos, rotation=45, ha="right", fontsize=10)
 
     for i, (barra, valor) in enumerate(zip(barras, valores)):
         texto_extra = ""
-        if i == idx_max:
+        if i == 0:
             texto_extra = "\n(Mejor)"
-        elif i == idx_min:
+        elif i == len(valores) - 1:
             texto_extra = "\n(Peor)"
 
         ax.text(
@@ -941,15 +950,15 @@ def generar_grafica_barras(df, columna, titulo, nombre_archivo, output_dir, y_la
             f"{valor:.2f}{texto_extra}",
             ha="center",
             va="bottom",
-            fontsize=8,
-            fontweight="bold" if (i == idx_max or i == idx_min) else "normal"
+            fontsize=9,
+            fontweight="bold" if (i == 0 or i == len(valores) - 1) else "normal"
         )
 
     plt.tight_layout()
     ruta = output_dir / nombre_archivo
     plt.savefig(ruta, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"  -> Grafica: {ruta}")
+    print(f"  -> Gráfica: {ruta}")
 
 
 def generar_scatter(df, x_col, y_col, titulo, nombre_archivo, output_dir, x_label, y_label):
@@ -1384,7 +1393,6 @@ def generar_graficas_comparativas(df_base, df_resumen, df_folds, arquitectura, o
     ]:
         generar_grafica_barras(df_modelos, col, tit, nom, output_dir_comp, y_label="Porcentaje de Rendimiento (%)", porcentaje=False)
 
-    # Gráficas de tiempo corregidas con unidades explícitas (segundos)
     for col, tit, nom in [
         ("Tiempo_s", f"Tiempo total de procesamiento en segundos para {arquitectura}", f"Comparativa_{prefijo}_Tiempo_Total.png"),
         ("Tiempo_Transformacion_s", f"Tiempo de transformacion TINTOlib en segundos para {arquitectura}", f"Comparativa_{prefijo}_Tiempo_Transformacion.png"),
@@ -1473,7 +1481,7 @@ def generar_analisis_arquitecturas(df_resumen, output_dir):
 
 
 # ==========================================
-# MAIN PRINCIPAL
+# MAIN PRINCIPAL CON MENÚ REPETIBLE
 # ==========================================
 
 def main():
@@ -1485,124 +1493,134 @@ def main():
         print(f"\nNo existe la carpeta Results:\n  {RESULTS_DIR}")
         return
 
-    generar_tabla_resumen_general() 
+    # Generar el resumen general global una sola vez al inicio
+    generar_tabla_resumen_general()
 
     baselines = buscar_baselines()
     if not baselines:
         print("\nNo se encontraron archivos Baseline_*.csv")
         return
 
-    print("\nDatasets disponibles:")
     datasets = []
     for indice, baseline in enumerate(baselines, start=1):
         dataset = extraer_dataset_desde_baseline(baseline)
         datasets.append({"nombre": dataset, "baseline": baseline})
-        print(f"  {indice}. {dataset}")
 
+    # Bucle del menú interactivo repetible
     while True:
+        print("\n" + "=" * 50)
+        print("          MENÚ DE SELECCIÓN DE DATASETS")
+        print("=" * 50)
+        for indice, ds in enumerate(datasets, start=1):
+            print(f"  {indice}. {ds['nombre']}")
+        print("  q. Salir del programa")
+        print("-" * 50)
+
+        seleccion = input("\nSelecciona el número del dataset a graficar (o 'q' para salir): ").strip().lower()
+
+        if seleccion == 'q':
+            print("\nSaliendo del programa. ¡Hasta luego!")
+            break
+
         try:
-            seleccion = input("\nSelecciona el numero del dataset a graficar: ").strip()
             numero = int(seleccion)
             if 1 <= numero <= len(datasets):
-                break
-            print("Seleccion invalida.")
+                dataset_seleccionado = datasets[numero - 1]["nombre"]
+                baseline_path = datasets[numero - 1]["baseline"]
+
+                print(f"\n[Procesando] Dataset seleccionado: {dataset_seleccionado}")
+
+                nombre_muestra_limpio = limpiar_nombre_archivo(dataset_seleccionado)
+                dir_dataset = BASE_ANALYSIS_DIR / nombre_muestra_limpio
+
+                dir_comparativas = asegurar_directorio(dir_dataset / "Comparativas")
+                dir_tablas = asegurar_directorio(dir_dataset / "Tablas")
+                dir_tablas_visuales = asegurar_directorio(dir_dataset / "Tablas_Visuales")
+                dir_folds = asegurar_directorio(dir_dataset / "Folds")
+                dir_arquitecturas = asegurar_directorio(dir_dataset / "Arquitecturas")
+                dir_loss = asegurar_directorio(dir_dataset / "Loss")
+                dir_estadisticas = asegurar_directorio(dir_dataset / "Estadisticas")
+                dir_matrices = asegurar_directorio(dir_dataset / "Matrices_Confusion")
+                dir_csvs = asegurar_directorio(dir_dataset / "CSVs")
+
+                df_base = cargar_baseline(baseline_path)
+                df_folds, df_historial, df_predicciones = cargar_deep_learning(dataset_seleccionado)
+
+                df_resumen = generar_resumen_desde_folds(df_folds)
+
+                for df_target in [df_resumen, df_folds]:
+                    if not df_target.empty:
+                        for col in (COLUMNAS_METRICAS + COLUMNAS_TIEMPO + COLUMNAS_RECURSOS):
+                            if col in df_target.columns:
+                                df_target[col] = convertir_numerico(df_target[col])
+
+                arquitecturas = []
+                if not df_resumen.empty:
+                    arquitecturas.extend(df_resumen["Arquitectura"].dropna().unique().tolist())
+                if not df_folds.empty:
+                    arquitecturas.extend(df_folds["Arquitectura"].dropna().unique().tolist())
+
+                arquitecturas = list(dict.fromkeys([a for a in arquitecturas if a in ARQUITECTURAS_ESPERADAS]))
+                if not df_resumen.empty:
+                    for a in df_resumen["Arquitectura"].dropna().unique():
+                        if a not in arquitecturas:
+                            arquitecturas.append(a)
+
+                for arquitectura in arquitecturas:
+                    generar_graficas_comparativas(df_base, df_resumen, df_folds, arquitectura, dir_comparativas, dir_tablas, dir_tablas_visuales, dataset_seleccionado)
+
+                if not df_folds.empty:
+                    generar_analisis_folds(df_folds, dir_folds)
+
+                if not df_predicciones.empty:
+                    generar_analisis_matrices_confusion(df_predicciones, dir_matrices)
+
+                if not df_resumen.empty:
+                    generar_analisis_arquitecturas(df_resumen, dir_arquitecturas)
+
+                if not df_historial.empty:
+                    df_historial.to_csv(dir_csvs / "Historial_Loss_Unificado.csv", index=False, encoding="utf-8-sig")
+                    generar_graficas_historial(df_historial, dir_loss)
+
+                stats_folds = calcular_estadisticas_folds(df_folds)
+                if not stats_folds.empty:
+                    stats_folds.to_csv(dir_csvs / "Estadisticas_Folds.csv", index=False, encoding="utf-8-sig")
+
+                stats_arq = calcular_estadisticas_arquitecturas(df_resumen)
+                if not stats_arq.empty:
+                    stats_arq.to_csv(dir_csvs / "Estadisticas_Arquitecturas.csv", index=False, encoding="utf-8-sig")
+
+                pruebas = calcular_pruebas_estadisticas(df_folds)
+                if not pruebas.empty:
+                    pruebas.to_csv(dir_csvs / "Pruebas_Estadisticas.csv", index=False, encoding="utf-8-sig")
+                    for arquitectura in sorted(pruebas["Arquitectura"].dropna().unique()):
+                        generar_grafica_pvalues(pruebas, arquitectura, dir_estadisticas)
+
+                if not df_resumen.empty:
+                    corr = generar_correlacion(
+                        df_resumen,
+                        COLUMNAS_METRICAS + COLUMNAS_TIEMPO + COLUMNAS_RECURSOS,
+                        "Correlacion global entre metricas de rendimiento y recursos del sistema",
+                        "Correlacion_Global.png",
+                        dir_estadisticas
+                    )
+                    if corr is not None:
+                        corr.to_csv(dir_csvs / "Matriz_Correlacion.csv", encoding="utf-8-sig")
+
+                if not df_folds.empty:
+                    df_folds.to_csv(dir_csvs / "Resultados_Folds_Unificados.csv", index=False, encoding="utf-8-sig")
+
+                if not df_resumen.empty:
+                    df_resumen.to_csv(dir_csvs / "Resultados_Resumen_Unificados.csv", index=False, encoding="utf-8-sig")
+
+                print("\n" + "=" * 70)
+                print(f"ANALISIS COMPLETADO PARA: {dataset_seleccionado}")
+                print(f"Directorio guardado en: {dir_dataset}")
+                print("=" * 70)
+            else:
+                print("[Error] Número de dataset inválido. Inténtalo de nuevo.")
         except ValueError:
-            print("Introduce un numero valido.")
-
-    dataset_seleccionado = datasets[numero - 1]["nombre"]
-    baseline_path = datasets[numero - 1]["baseline"]
-
-    print(f"\nDataset seleccionado: {dataset_seleccionado}")
-
-    nombre_muestra_limpio = limpiar_nombre_archivo(dataset_seleccionado)
-    dir_dataset = BASE_ANALYSIS_DIR / nombre_muestra_limpio
-
-    dir_comparativas = asegurar_directorio(dir_dataset / "Comparativas")
-    dir_tablas = asegurar_directorio(dir_dataset / "Tablas")
-    dir_tablas_visuales = asegurar_directorio(dir_dataset / "Tablas_Visuales")
-    dir_folds = asegurar_directorio(dir_dataset / "Folds")
-    dir_arquitecturas = asegurar_directorio(dir_dataset / "Arquitecturas")
-    dir_loss = asegurar_directorio(dir_dataset / "Loss")
-    dir_estadisticas = asegurar_directorio(dir_dataset / "Estadisticas")
-    dir_matrices = asegurar_directorio(dir_dataset / "Matrices_Confusion")
-    dir_csvs = asegurar_directorio(dir_dataset / "CSVs")
-
-    df_base = cargar_baseline(baseline_path)
-    df_folds, df_historial, df_predicciones = cargar_deep_learning(dataset_seleccionado)
-
-    df_resumen = generar_resumen_desde_folds(df_folds)
-
-    for df_target in [df_resumen, df_folds]:
-        if not df_target.empty:
-            for col in (COLUMNAS_METRICAS + COLUMNAS_TIEMPO + COLUMNAS_RECURSOS):
-                if col in df_target.columns:
-                    df_target[col] = convertir_numerico(df_target[col])
-
-    arquitecturas = []
-    if not df_resumen.empty:
-        arquitecturas.extend(df_resumen["Arquitectura"].dropna().unique().tolist())
-    if not df_folds.empty:
-        arquitecturas.extend(df_folds["Arquitectura"].dropna().unique().tolist())
-
-    arquitecturas = list(dict.fromkeys([a for a in arquitecturas if a in ARQUITECTURAS_ESPERADAS]))
-    if not df_resumen.empty:
-        for a in df_resumen["Arquitectura"].dropna().unique():
-            if a not in arquitecturas:
-                arquitecturas.append(a)
-
-    for arquitectura in arquitecturas:
-        generar_graficas_comparativas(df_base, df_resumen, df_folds, arquitectura, dir_comparativas, dir_tablas, dir_tablas_visuales, dataset_seleccionado)
-
-    if not df_folds.empty:
-        generar_analisis_folds(df_folds, dir_folds)
-
-    if not df_predicciones.empty:
-        generar_analisis_matrices_confusion(df_predicciones, dir_matrices)
-
-    if not df_resumen.empty:
-        generar_analisis_arquitecturas(df_resumen, dir_arquitecturas)
-
-    if not df_historial.empty:
-        df_historial.to_csv(dir_csvs / "Historial_Loss_Unificado.csv", index=False, encoding="utf-8-sig")
-        generar_graficas_historial(df_historial, dir_loss)
-
-    stats_folds = calcular_estadisticas_folds(df_folds)
-    if not stats_folds.empty:
-        stats_folds.to_csv(dir_csvs / "Estadisticas_Folds.csv", index=False, encoding="utf-8-sig")
-
-    stats_arq = calcular_estadisticas_arquitecturas(df_resumen)
-    if not stats_arq.empty:
-        stats_arq.to_csv(dir_csvs / "Estadisticas_Arquitecturas.csv", index=False, encoding="utf-8-sig")
-
-    pruebas = calcular_pruebas_estadisticas(df_folds)
-    if not pruebas.empty:
-        pruebas.to_csv(dir_csvs / "Pruebas_Estadisticas.csv", index=False, encoding="utf-8-sig")
-        for arquitectura in sorted(pruebas["Arquitectura"].dropna().unique()):
-            generar_grafica_pvalues(pruebas, arquitectura, dir_estadisticas)
-
-    if not df_resumen.empty:
-        corr = generar_correlacion(
-            df_resumen,
-            COLUMNAS_METRICAS + COLUMNAS_TIEMPO + COLUMNAS_RECURSOS,
-            "Correlacion global entre metricas de rendimiento y recursos del sistema",
-            "Correlacion_Global.png",
-            dir_estadisticas
-        )
-        if corr is not None:
-            corr.to_csv(dir_csvs / "Matriz_Correlacion.csv", encoding="utf-8-sig")
-
-    if not df_folds.empty:
-        df_folds.to_csv(dir_csvs / "Resultados_Folds_Unificados.csv", index=False, encoding="utf-8-sig")
-
-    if not df_resumen.empty:
-        df_resumen.to_csv(dir_csvs / "Resultados_Resumen_Unificados.csv", index=False, encoding="utf-8-sig")
-
-    print("\n" + "=" * 70)
-    print("ANALISIS VISUAL COMPLETADO")
-    print("=" * 70)
-    print(f"Dataset: {dataset_seleccionado}")
-    print(f"Directorio estructurado: {dir_dataset}")
-    print("=" * 70)
+            print("[Error] Entrada no reconocida. Introduce un número válido o 'q'.")
 
 
 if __name__ == "__main__":

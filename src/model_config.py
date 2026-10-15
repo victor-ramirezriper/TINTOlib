@@ -4,7 +4,7 @@ import multiprocessing
 
 from TINTOlib.tinto import TINTO
 from TINTOlib.igtd import IGTD
-#from TINTOlib.refined import REFINED
+from TINTOlib.refined import REFINED
 from TINTOlib.barGraph import BarGraph
 from TINTOlib.distanceMatrix import DistanceMatrix
 from TINTOlib.combination import Combination
@@ -105,15 +105,15 @@ def crear_modelo(metodo, numero_features):
     # ---------------------------------------------------------
     # REFINED
     # ---------------------------------------------------------
-   # elif metodo == "refined":
-    #    return REFINED(
-     #      problem=PROBLEM,
-      #     hcIterations=1,
-       #    n_processors=obtener_numero_procesadores(), # Ajuste dinámico de CPU
+    elif metodo == "refined":
+        return REFINED(
+           problem=PROBLEM,
+           hcIterations=1,
+           n_processors=obtener_numero_procesadores(), # Ajuste dinámico de CPU
            #n_processors=8,
-        #   random_seed=SEED,
-         #  verbose=True
-       # )
+           random_seed=SEED,
+          verbose=True
+        )
 
     # ---------------------------------------------------------
     # BarGraph
