@@ -1,4 +1,5 @@
 import os
+import time
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold
 
@@ -150,7 +151,15 @@ if __name__ == "__main__":
                 nombre_metodo_train = f"EXP_{metodo.upper()}_TRAIN"
                 nombre_metodo_test = f"EXP_{metodo.upper()}_TEST"
 
+                # Bloque de control y métricas específicas si el método es REFINED
+                es_refined = (metodo.lower() == "refined")
+                
+                if es_refined:
+                    print(f"\n[REFINED] -> [1/3] Inicio de reducción dimensional para TRAIN...")
+                    t_inicio_red = time.time()
+
                 # --- ENTRENAMIENTO DEL FOLD ---
+                t_inicio_gen_train = time.time()
                 generar_imagenes(
                     modelo=modelo,
                     metodo=nombre_metodo_train,
@@ -164,8 +173,14 @@ if __name__ == "__main__":
                     fold_actual=fold,
                     total_folds=N_FOLDS
                 )
-                
+                t_fin_gen_train = time.time()
+
+                if es_refined:
+                    print(f"[REFINED] -> Reducción dimensional y generación TRAIN completadas en {t_fin_gen_train - t_inicio_gen_train:.2f} segundos.")
+                    print(f"[REFINED] -> [2/3] Inicio de reducción dimensional para TEST...")
+
                 # --- PRUEBA DEL FOLD ---
+                t_inicio_gen_test = time.time()
                 generar_imagenes(
                     modelo=modelo,
                     metodo=nombre_metodo_test,
@@ -179,9 +194,16 @@ if __name__ == "__main__":
                     fold_actual=fold,
                     total_folds=N_FOLDS
                 )
+                t_fin_gen_test = time.time()
+
+                if es_refined:
+                    print(f"[REFINED] -> [3/3] Generación y guardado de imágenes TEST completados en {t_fin_gen_test - t_inicio_gen_test:.2f} segundos.")
+                    print(f"[REFINED] -> Resumen de tiempos REFINED en Fold {fold}: Total global aproximado = {(t_fin_gen_test - t_inicio_gen_train):.2f}s\n")
                 
             except Exception as e:
                 print(f"\nError crítico al ejecutar {metodo.upper()} en Fold {fold}: {e}")
+                if es_refined:
+                    print(f"[REFINED ERROR] Se registró una falla o excepción en el subproceso/programa externo o proceso de imágenes.")
                 print("Saltando al siguiente método...\n")
 
 print("\n" + "=" * 60)
