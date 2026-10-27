@@ -1,0 +1,20 @@
+﻿Dataset,Instancias,Features,Num_Clases,Categoria,Desbalance,Dataset_Real
+BASE_19,73,22,2,Social Science,N/A,non-verbal-tourist_Original
+BASE_5,90,6,2,Health and Medicine,N/A,Cryotherapy_Original
+BASE_10,90,8,2,Health and Medicine,N/A,Immunotherapy_Original
+BASE_6,174,451,2,Health and Medicine,N/A,DARWIN_Original
+BASE_3,208,60,2,Physics and Chemistry,N/A,"Connectionist_Bench_(Sonar,_Mines_vs._Rocks)_Original"
+BASE_9,210,19,7,Other,N/A,Image_Segmentation_Original
+BASE_18,299,12,2,Health and Medicine,N/A,heart_failure_clinical_records_dataset_Original
+BASE_14,383,16,2,Health and Medicine,N/A,Thyroid_Diff_Original
+BASE_15,403,5,5,Computer Science,N/A,User_Knowledge_Modeling_Original
+BASE_11,714,14,3,Health and Medicine,N/A,National_Poll_on_Healthy_Aging_(NPHA)_Original
+BASE_13,839,23,2,Health and Medicine,N/A,TCGA_InfoWithGrade_Original
+BASE_12,1000,20,2,Social Science,N/A,Statlog_(German_Credit_Data)_Original
+BASE_17,1353,9,3,Computer Science,N/A,Website_Phishing_Original
+BASE_8,1385,28,4,Health and Medicine,N/A,Hepatitis_C_Virus_(HCV)_for_Egyptian_patients_Original
+BASE_4,1473,9,3,Health and Medicine,N/A,Contraceptive_Method_Choice_Original
+BASE_7,2111,16,7,Health and Medicine,N/A,Estimation_of_Obesity_Levels_Based_On_Eating_Habits_and_Physical_Condition_Original
+BASE_1,2139,23,2,Health and Medicine,N/A,AIDS_Clinical_Trials_Group_Study_175_Original
+BASE_2,3196,35,2,Games,N/A,Chess_(King-Rook_vs._King-Pawn)_Original
+BASE_16,5000,21,3,Physics and Chemistry,N/A,Waveform_Database_Generator_(Version_1)_Original

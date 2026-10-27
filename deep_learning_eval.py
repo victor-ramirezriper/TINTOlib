@@ -2,10 +2,11 @@ import os
 import time
 import json
 import random
+import copy
 import pandas as pd
 import numpy as np
 import warnings
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from datetime import datetime
 
 # Monitoreo de hardware
@@ -15,9 +16,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import models, transforms
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, Subset
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.utils.class_weight import compute_class_weight
+from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 import timm
 
@@ -47,23 +49,35 @@ class TintoDataset(Dataset):
         self.transform = transform
         
         ruta_etiquetas = self.folder_path / "etiquetas.csv"
-        if not ruta_etiquetas.exists():
-            raise FileNotFoundError(f"Falta etiquetas.csv en {self.folder_path}")
-            
+        ruta_class = self.folder_path / "classification.csv"
+        if not ruta_etiquetas.is_file() or not ruta_class.is_file():
+            raise FileNotFoundError(f"Faltan etiquetas.csv o classification.csv en {self.folder_path}")
+
         df_etiquetas = pd.read_csv(ruta_etiquetas)
-        self.labels = df_etiquetas.iloc[:, 0].values 
-        
-        extensiones = {".png", ".jpg", ".jpeg", ".bmp"}
-        archivos_img = [f for f in self.folder_path.rglob('*') if f.suffix.lower() in extensiones]
-        
-        def extract_number(filepath):
-            numeros = ''.join(filter(str.isdigit, filepath.stem))
-            return int(numeros) if numeros else 0
-            
-        self.image_files = sorted(archivos_img, key=extract_number)
-        
-        if len(self.image_files) != len(self.labels):
-            raise ValueError(f"Inconsistencia en {self.folder_path}: {len(self.image_files)} imágenes vs {len(self.labels)} etiquetas.")
+        df_class = pd.read_csv(ruta_class)
+        if df_etiquetas.shape[1] != 1 or "images" not in df_class.columns:
+            raise ValueError(f"Formato de etiquetas/classification incorrecto: {self.folder_path}")
+        if len(df_etiquetas) != len(df_class):
+            raise ValueError(f"Cantidad de etiquetas y rutas distinta: {self.folder_path}")
+        self.labels = df_etiquetas.iloc[:, 0].to_numpy()
+        if not np.issubdtype(self.labels.dtype, np.integer):
+            raise ValueError("Las etiquetas deben estar codificadas como enteros")
+
+        # La fila de classification.csv corresponde a la fila de etiquetas.csv.
+        # Las subcarpetas 00/01 NO representan necesariamente las clases.
+        self.image_files = []
+        for ruta in df_class["images"]:
+            if pd.isna(ruta):
+                raise ValueError("Ruta de imagen vacía en classification.csv")
+            partes = PureWindowsPath(str(ruta).replace("/", "\\")).parts
+            if not partes or any(x in ("..", "") for x in partes):
+                raise ValueError(f"Ruta inválida en classification.csv: {ruta}")
+            archivo = self.folder_path.joinpath(*partes)
+            if not archivo.is_file():
+                raise FileNotFoundError(f"Imagen inexistente: {archivo}")
+            self.image_files.append(archivo)
+        if len(set(self.image_files)) != len(self.image_files):
+            raise ValueError("Hay rutas de imágenes duplicadas en classification.csv")
 
         # ========================================================
         # CARGA PREVIA EN RAM (Evita cuello de botella del SSD)
@@ -163,16 +177,26 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
         ruta_train = ruta_lote_base / f"FOLD_{fold}" / "Imagenes" / f"EXP_{metodo.upper()}_TRAIN"
         ruta_test = ruta_lote_base / f"FOLD_{fold}" / "Imagenes" / f"EXP_{metodo.upper()}_TEST"
 
-        if not ruta_train.exists() or not ruta_test.exists():
-            print(f"   Fold {fold} no encontrado. Saltando...")
-            continue
+        if not ruta_train.is_dir() or not ruta_test.is_dir():
+            raise FileNotFoundError(f"Falta TRAIN o TEST del fold {fold}: {metodo}")
 
         dataset_train = TintoDataset(ruta_train, transform=transformaciones)
         dataset_test = TintoDataset(ruta_test, transform=transformaciones)
 
-        num_clases = len(np.unique(dataset_train.labels))
-
-        train_loader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True,  num_workers=0, 
+        clases_unicas = np.unique(dataset_train.labels)
+        num_clases = len(clases_unicas)
+        if not np.array_equal(clases_unicas, np.arange(num_clases)):
+            raise ValueError("Etiquetas TRAIN deben ser enteros consecutivos desde 0")
+        if not np.isin(dataset_test.labels, clases_unicas).all():
+            raise ValueError("TEST contiene clases no presentes en TRAIN")
+        indices_train, indices_val = train_test_split(
+            np.arange(len(dataset_train)), test_size=0.2, random_state=42,
+            stratify=dataset_train.labels)
+        train_subset = Subset(dataset_train, indices_train)
+        val_subset = Subset(dataset_train, indices_val)
+        train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True, num_workers=0,
+    pin_memory=True)
+        val_loader = DataLoader(val_subset, batch_size=batch_size, shuffle=False, num_workers=0,
     pin_memory=True)
         test_loader = DataLoader(dataset_test, batch_size=batch_size, shuffle=False,  num_workers=0, 
     pin_memory=True)
@@ -182,8 +206,7 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
         # ========================================================
         # CÁLCULO DE PESOS DE CLASE (Mitigación justa de desbalanceo)
         # ========================================================
-        clases_unicas = np.unique(dataset_train.labels)
-        pesos_clase = compute_class_weight('balanced', classes=clases_unicas, y=dataset_train.labels)
+        pesos_clase = compute_class_weight('balanced', classes=clases_unicas, y=dataset_train.labels[indices_train])
         pesos_tensor = torch.tensor(pesos_clase, dtype=torch.float).to(device)
         
         criterio = nn.CrossEntropyLoss(weight=pesos_tensor)
@@ -196,6 +219,8 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
         if device.type == 'cuda':
             torch.cuda.reset_peak_memory_stats(device)
 
+        mejor_val_loss = float("inf")
+        mejores_pesos = None
         for epoch in range(epochs):
             modelo.train()
             train_loss_acum = 0.0
@@ -213,18 +238,21 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
                 max_ram_fold = max(max_ram_fold, meminfo.rss / (1024 ** 3))
                 cpu_percents.append(proceso.cpu_percent(interval=None))
 
-            train_loss = train_loss_acum / len(dataset_train)
+            train_loss = train_loss_acum / len(train_subset)
 
             modelo.eval()
             val_loss_acum = 0.0
             with torch.no_grad():
-                for inputs, labels in test_loader:
+                for inputs, labels in val_loader:
                     inputs, labels = inputs.to(device), labels.to(device)
                     outputs = modelo(inputs)
                     loss = criterio(outputs, labels)
                     val_loss_acum += loss.item() * inputs.size(0)
             
-            val_loss = val_loss_acum / len(dataset_test)
+            val_loss = val_loss_acum / len(val_subset)
+            if val_loss < mejor_val_loss:
+                mejor_val_loss = val_loss
+                mejores_pesos = copy.deepcopy(modelo.state_dict())
 
             registro_historial.append({
                 "Metodo": metodo,
@@ -235,6 +263,7 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
             })
 
         tiempo_train_fold = time.perf_counter() - inicio_train
+        modelo.load_state_dict(mejores_pesos)
 
         avg_cpu_fold = sum(cpu_percents) / len(cpu_percents) if cpu_percents else 0
         max_vram_fold = torch.cuda.max_memory_allocated(device) / (1024 ** 3) if device.type == 'cuda' else 0
@@ -250,9 +279,9 @@ def entrenar_kfold_por_carpetas(ruta_lote_base, metodo, red_seleccionada, n_spli
                 probs = torch.nn.functional.softmax(outputs, dim=1)
                 _, preds = torch.max(outputs, 1)
 
-                y_true.extend(labels.cpu.numpy())
-                y_pred.extend(preds.cpu.numpy())
-                y_proba.extend(probs.cpu.numpy())
+                y_true.extend(labels.cpu().numpy())
+                y_pred.extend(preds.cpu().numpy())
+                y_proba.extend(probs.cpu().numpy())
 
         tiempo_eval_fold = time.perf_counter() - inicio_eval
 

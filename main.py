@@ -92,6 +92,7 @@ if __name__ == "__main__":
     nombre_lote, ruta_lote_maestra = crear_carpeta_lote(nombre_lote_estrategia)
     print(f"\nCarpeta maestra asignada: {ruta_lote_maestra}")
 
+    errores_experimentos = []
     # BUCLE DE FOLDS
     for fold, (train_idx, test_idx) in enumerate(skf.split(X, y), 1):
         print("\n" + f" FOLD {fold} DE {N_FOLDS} ".center(60, "="))
@@ -160,7 +161,7 @@ if __name__ == "__main__":
 
                 # --- ENTRENAMIENTO DEL FOLD ---
                 t_inicio_gen_train = time.time()
-                generar_imagenes(
+                resultado_train = generar_imagenes(
                     modelo=modelo,
                     metodo=nombre_metodo_train,
                     df_features=X_train_final, 
@@ -173,6 +174,8 @@ if __name__ == "__main__":
                     fold_actual=fold,
                     total_folds=N_FOLDS
                 )
+                if not resultado_train["valido"]:
+                    raise RuntimeError(f"TRAIN inválido: {resultado_train.get('errores_verificacion', [])}")
                 t_fin_gen_train = time.time()
 
                 if es_refined:
@@ -181,7 +184,7 @@ if __name__ == "__main__":
 
                 # --- PRUEBA DEL FOLD ---
                 t_inicio_gen_test = time.time()
-                generar_imagenes(
+                resultado_test = generar_imagenes(
                     modelo=modelo,
                     metodo=nombre_metodo_test,
                     df_features=X_test_scaled, 
@@ -194,6 +197,8 @@ if __name__ == "__main__":
                     fold_actual=fold,
                     total_folds=N_FOLDS
                 )
+                if not resultado_test["valido"]:
+                    raise RuntimeError(f"TEST inválido: {resultado_test.get('errores_verificacion', [])}")
                 t_fin_gen_test = time.time()
 
                 if es_refined:
@@ -201,11 +206,17 @@ if __name__ == "__main__":
                     print(f"[REFINED] -> Resumen de tiempos REFINED en Fold {fold}: Total global aproximado = {(t_fin_gen_test - t_inicio_gen_train):.2f}s\n")
                 
             except Exception as e:
+                errores_experimentos.append((fold, metodo, str(e)))
                 print(f"\nError crítico al ejecutar {metodo.upper()} en Fold {fold}: {e}")
                 if es_refined:
                     print(f"[REFINED ERROR] Se registró una falla o excepción en el subproceso/programa externo o proceso de imágenes.")
                 print("Saltando al siguiente método...\n")
 
 print("\n" + "=" * 60)
-print(f"¡GENERACIÓN DE IMÁGENES FINALIZADA CON ÉXITO!")
+if errores_experimentos:
+    print(f"GENERACIÓN FINALIZADA CON {len(errores_experimentos)} ERROR(ES)")
+    for fold_error, metodo_error, mensaje_error in errores_experimentos:
+        print(f"  Fold {fold_error} / {metodo_error}: {mensaje_error}")
+else:
+    print("¡GENERACIÓN DE IMÁGENES FINALIZADA SIN ERRORES DETECTADOS!")
 print("=" * 60)

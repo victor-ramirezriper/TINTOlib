@@ -89,35 +89,160 @@ def formatear_parametros(parametros):
 # VERIFICACIÓN DEL RESULTADO
 # ============================================================
 
-def verificar_resultado(carpeta_salida, imagenes_esperadas):
+def verificar_resultado(carpeta_salida, imagenes_esperadas, df_features=None, series_target=None):
+    """Audita classification.csv, imágenes y etiquetas contra las entradas del fold.
+
+    La asociación imagen-fila se comprueba mediante la fila de classification.csv
+    que contiene su ruta, no mediante el nombre de la subcarpeta (00/01 no es clase).
+    """
+    import numpy as np
+    from pathlib import PureWindowsPath
+
     carpeta_salida = Path(carpeta_salida)
-    
+    extensiones = {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".webp"}
     resultado = {
         "carpeta_salida": str(carpeta_salida),
-        "carpeta_existe": carpeta_salida.exists(),
-        "imagenes_generadas": 0,
-        "imagenes_esperadas": imagenes_esperadas,
-        "cantidad_correcta": False,
-        "resoluciones": set(),
-        "resolucion_consistente": False,
-        "archivos_generados": [],
-        "valido": False
+        "carpeta_existe": carpeta_salida.is_dir(),
+        "imagenes_generadas": 0, "imagenes_esperadas": imagenes_esperadas,
+        "cantidad_correcta": False, "resoluciones": set(),
+        "resolucion_consistente": False, "archivos_generados": [],
+        "etiquetas_correctas": False, "classification_correcto": False,
+        "correspondencia_verificada": False, "errores_verificacion": [],
+        "valido": False,
     }
-
-    if not carpeta_salida.exists():
+    errores = resultado["errores_verificacion"]
+    if not carpeta_salida.is_dir():
+        errores.append("No existe la carpeta de imágenes")
         return resultado
 
-    cantidad = contar_imagenes(carpeta_salida)
-    resoluciones = obtener_resoluciones(carpeta_salida)
-    archivos = obtener_archivos_generados(carpeta_salida)
+    imagenes = [p for p in carpeta_salida.rglob("*")
+                if p.is_file() and p.suffix.lower() in extensiones]
+    resultado["imagenes_generadas"] = len(imagenes)
+    resultado["cantidad_correcta"] = len(imagenes) == imagenes_esperadas
+    resultado["archivos_generados"] = obtener_archivos_generados(carpeta_salida)
+    if not resultado["cantidad_correcta"]:
+        errores.append(f"Cantidad incorrecta: {len(imagenes)} imágenes, esperadas {imagenes_esperadas}")
 
-    resultado["imagenes_generadas"] = cantidad
-    resultado["cantidad_correcta"] = (cantidad == imagenes_esperadas)
-    resultado["resoluciones"] = resoluciones
-    resultado["resolucion_consistente"] = (len(resoluciones) <= 1)
-    resultado["archivos_generados"] = archivos
-    resultado["valido"] = resultado["carpeta_existe"] and resultado["cantidad_correcta"] and cantidad > 0
+    dimensiones = set()
+    for ruta in imagenes:
+        try:
+            with Image.open(ruta) as im:
+                im.verify()
+            with Image.open(ruta) as im:
+                dimensiones.add(im.size)
+        except Exception as exc:
+            errores.append(f"Imagen ilegible: {ruta.relative_to(carpeta_salida)} ({exc})")
+    resultado["resoluciones"] = dimensiones
+    resultado["resolucion_consistente"] = len(dimensiones) == 1
+    if not resultado["resolucion_consistente"]:
+        errores.append("No hay una resolución única de imágenes válidas")
 
+    ruta_etiquetas = carpeta_salida / "etiquetas.csv"
+    if not ruta_etiquetas.is_file():
+        errores.append("Falta etiquetas.csv")
+    else:
+        try:
+            etiquetas = pd.read_csv(ruta_etiquetas)
+            ok = len(etiquetas) == imagenes_esperadas and etiquetas.shape[1] == 1
+            if ok and series_target is not None:
+                esperado = pd.Series(series_target).reset_index(drop=True)
+                guardado = etiquetas.iloc[:, 0].reset_index(drop=True)
+                ok = guardado.equals(esperado) or (
+                    guardado.astype(str).equals(esperado.astype(str))
+                )
+            resultado["etiquetas_correctas"] = bool(ok)
+            if not ok:
+                errores.append("etiquetas.csv no coincide con las etiquetas de entrada en cantidad u orden")
+        except Exception as exc:
+            errores.append(f"No se pudo leer etiquetas.csv: {exc}")
+
+    ruta_class = carpeta_salida / "classification.csv"
+    if not ruta_class.is_file():
+        errores.append("Falta classification.csv")
+    else:
+        try:
+            clas = pd.read_csv(ruta_class)
+            if "images" not in clas.columns:
+                errores.append("classification.csv no contiene la columna images")
+            elif len(clas) != imagenes_esperadas:
+                errores.append(f"classification.csv contiene {len(clas)} filas, esperadas {imagenes_esperadas}")
+            else:
+                rutas = []
+                for valor in clas["images"]:
+                    if pd.isna(valor):
+                        errores.append("Ruta vacía en classification.csv")
+                        continue
+                    # TINTOlib escribe rutas Windows incluso en archivos compartidos.
+                    partes = PureWindowsPath(str(valor)).parts
+                    if not partes or any(p in ("..", "") for p in partes):
+                        errores.append(f"Ruta insegura en classification.csv: {valor}")
+                        continue
+                    destino = carpeta_salida.joinpath(*partes)
+                    if destino.suffix.lower() not in extensiones:
+                        errores.append(f"Ruta no corresponde a una imagen: {valor}")
+                    if not destino.is_file():
+                        errores.append(f"Imagen referenciada inexistente: {valor}")
+                    rutas.append(destino.resolve())
+                if len(set(rutas)) != len(rutas):
+                    errores.append("Hay imágenes repetidas en classification.csv")
+                if set(rutas) != {p.resolve() for p in imagenes}:
+                    errores.append("Las imágenes de classification.csv no coinciden con las del directorio")
+                columnas = [c for c in clas.columns if c != "images"]
+                if df_features is None:
+                    errores.append("No se suministraron características para cotejar classification.csv")
+                elif len(df_features) != len(clas):
+                    errores.append("Filas de características distintas a classification.csv")
+                elif len(columnas) != len(set(columnas)):
+                    errores.append("classification.csv tiene columnas de características duplicadas")
+                else:
+                    # Algunos métodos TINTOlib renombran una característica como
+                    # "values" en classification.csv. Sólo aceptamos ese alias
+                    # cuando hay exactamente una columna faltante y una extra,
+                    # y DESPUÉS comprobamos todos los valores fila por fila.
+                    esperado = df_features.reset_index(drop=True)
+                    faltantes = sorted(set(esperado.columns) - set(columnas))
+                    adicionales = sorted(set(columnas) - set(esperado.columns))
+                    mapa = {}
+                    if faltantes or adicionales:
+                        if len(faltantes) == 1 and adicionales == ["values"] and "values" not in esperado.columns:
+                            mapa = {"values": faltantes[0]}
+                            print(f"[AUDITORÍA] Alias de TINTOlib: values -> {faltantes[0]} (se cotejarán valores)")
+                        else:
+                            errores.append(
+                                f"Columnas distintas en classification.csv. "
+                                f"Faltantes: {faltantes}; adicionales: {adicionales}."
+                            )
+                    obtenido = clas[columnas].rename(columns=mapa)
+                    if not errores and set(obtenido.columns) == set(esperado.columns):
+                        obtenido = obtenido[list(esperado.columns)].reset_index(drop=True)
+                    else:
+                        obtenido = None
+                    if obtenido is not None:
+                        for c in esperado.columns:
+                            a = pd.to_numeric(esperado[c], errors="coerce")
+                            b = pd.to_numeric(obtenido[c], errors="coerce")
+                            if a.notna().all() and b.notna().all():
+                                iguales = np.allclose(a.to_numpy(dtype=float), b.to_numpy(dtype=float), rtol=1e-6, atol=1e-8)
+                            else:
+                                iguales = esperado[c].astype(str).equals(obtenido[c].astype(str))
+                            if not iguales:
+                                errores.append(f"Valores o orden de filas distintos en classification.csv: {c}")
+                                break
+                resultado["classification_correcto"] = not any(
+                    "classification.csv" in e or "Imagen referenciada" in e or "imágenes repetidas" in e
+                    or "Las imágenes de" in e or "Ruta " in e or "características" in e
+                    for e in errores
+                )
+        except Exception as exc:
+            errores.append(f"Error al leer o comparar classification.csv: {exc}")
+
+    resultado["correspondencia_verificada"] = (
+        resultado["classification_correcto"] and resultado["etiquetas_correctas"]
+    )
+    resultado["valido"] = (
+        resultado["cantidad_correcta"] and resultado["resolucion_consistente"]
+        and resultado["correspondencia_verificada"] and not errores
+    )
     return resultado
 
 # ============================================================
@@ -167,6 +292,12 @@ def guardar_resultado_txt(ruta_txt, experimento, metodo, estado, fecha_inicio, f
     
     lineas.append(f"Resoluciones encontradas: {resoluciones_texto}\n")
     lineas.append(f"Resolución consistente: {resultado.get('resolucion_consistente', False)}\n\n")
+    lineas.append(f"Etiquetas correctas: {resultado.get('etiquetas_correctas', False)}\n")
+    lineas.append(f"Classification correcto: {resultado.get('classification_correcto', False)}\n")
+    lineas.append(f"Correspondencia imagen-fila-etiqueta: {resultado.get('correspondencia_verificada', False)}\n")
+    for detalle in resultado.get("errores_verificacion", []):
+        lineas.append(f"Verificación: {detalle}\n")
+
 
     lineas.append("ARCHIVOS GENERADOS\n" + "-" * 70 + "\n")
     archivos_generados = resultado.get("archivos_generados", [])
@@ -231,6 +362,8 @@ def generar_imagenes(
     fold_actual=1,     # <--- NUEVO PARÁMETRO
     total_folds=1      # <--- NUEVO PARÁMETRO
 ):
+    if series_target is None or len(df_features) != len(series_target):
+        raise ValueError("Las características y etiquetas deben tener igual número de filas")
     if len(df_features) == 0:
         raise ValueError("El DataFrame procesado está vacío. Verifica las etapas de limpieza.")
 
@@ -279,7 +412,7 @@ def generar_imagenes(
         tiempo_transformacion = time.perf_counter() - inicio_transformacion
 
         inicio_verificacion = time.perf_counter()
-        resultado = verificar_resultado(carpeta_salida, numero_muestras)
+        resultado = verificar_resultado(carpeta_salida, numero_muestras, df_features, series_target)
         tiempo_verificacion = time.perf_counter() - inicio_verificacion
 
         if resultado["valido"]:
@@ -291,7 +424,7 @@ def generar_imagenes(
         error = e
         
         inicio_verificacion = time.perf_counter()
-        resultado = verificar_resultado(carpeta_salida, numero_muestras)
+        resultado = verificar_resultado(carpeta_salida, numero_muestras, df_features, series_target)
         tiempo_verificacion = time.perf_counter() - inicio_verificacion
         estado = "FALLIDO"
 
@@ -369,6 +502,8 @@ def generar_imagenes(
     print("-" * 60)
 
     return {
+        "errores_verificacion": resultado["errores_verificacion"],
+        "correspondencia_verificada": resultado["correspondencia_verificada"],
         "lote": nombre_lote,
         "metodo": metodo,
         "estado": estado,

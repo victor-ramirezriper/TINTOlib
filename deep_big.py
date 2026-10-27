@@ -91,6 +91,7 @@ if __name__ == "__main__":
     )
 
     resultados_totales = []
+    metodos_fallidos = []
 
     for metodo in metodos_a_evaluar:
         try:
@@ -98,6 +99,7 @@ if __name__ == "__main__":
             res = manager.entrenar_holdout_gran_escala(ruta_imagenes, metodo)
             resultados_totales.append(res)
         except Exception as e:
+            metodos_fallidos.append(metodo)
             print(f"[!] Error crítico evaluando {metodo}: {e}")
 
     # Guardar resultados globales en Results/
@@ -112,7 +114,11 @@ if __name__ == "__main__":
         df_resumen.to_csv(ruta_csv, index=False)
 
         print("\n" + "=" * 60)
-        print("¡EVALUACIÓN DE GRAN ESCALA FINALIZADA CON ÉXITO!")
+        print("EVALUACIÓN COMPLETADA" if not metodos_fallidos else "EVALUACIÓN PARCIAL: ALGUNOS MÉTODOS FALLARON")
         print(f"Resultados guardados en: {ruta_csv}")
         print("=" * 60)
         print(df_resumen.to_string(index=False))
+    if metodos_fallidos:
+        print(f"[!] Métodos fallidos: {', '.join(metodos_fallidos)}")
+    if not resultados_totales:
+        print("[!] Ningún método terminó correctamente; no se generó resumen.")

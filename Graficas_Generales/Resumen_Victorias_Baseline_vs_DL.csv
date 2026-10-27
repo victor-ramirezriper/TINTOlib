@@ -1,0 +1,5 @@
+﻿Arquitectura,Tipo_Ganador,Total_Victorias,Promedio_Instancias,Promedio_Features,Promedio_Clases,Promedio_Tiempo_s
+EfficientNet-B0,Deep Learning,19,1113,42,3,55.3
+ResNet18,Deep Learning,19,1113,42,3,34.3
+Tabular,Baseline,19,1113,42,3,0.64
+ViT,Deep Learning,19,1113,42,3,32.72

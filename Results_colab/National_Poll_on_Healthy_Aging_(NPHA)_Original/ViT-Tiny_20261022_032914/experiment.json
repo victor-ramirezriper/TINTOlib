@@ -1,0 +1,27 @@
+{
+    "dataset_lote": "National_Poll_on_Healthy_Aging_(NPHA)_Original_LOTE_01",
+    "red_neuronal": "ViT-Tiny (Transformer)",
+    "hardware_utilizado": "GPU (CUDA)",
+    "estrategia_desbalanceo": "Class_Weights (Balanced)",
+    "fecha_ejecucion": "2026-10-22 03:00:30",
+    "n_splits_kfold": 5,
+    "epochs": 10,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "optimizer": "Adam",
+    "loss_function": "CrossEntropyLoss (Weighted)",
+    "seed": 42,
+    "metodos_evaluados": [
+        "COMBINATION",
+        "TINTO",
+        "DISTANCEMATRIX",
+        "REFINED",
+        "DEEPINSIGHT",
+        "SUPERTML",
+        "FOTOMICS",
+        "FEATUREWRAP",
+        "BARGRAPH",
+        "BIE",
+        "IGTD"
+    ]
+}

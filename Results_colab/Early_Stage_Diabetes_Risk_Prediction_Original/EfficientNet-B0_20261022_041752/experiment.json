@@ -1,0 +1,27 @@
+{
+    "dataset_lote": "Early_Stage_Diabetes_Risk_Prediction_Original_LOTE_01",
+    "red_neuronal": "EfficientNet-B0 (CNN)",
+    "hardware_utilizado": "GPU (CUDA)",
+    "estrategia_desbalanceo": "Class_Weights (Balanced)",
+    "fecha_ejecucion": "2026-10-22 03:50:53",
+    "n_splits_kfold": 5,
+    "epochs": 10,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "optimizer": "Adam",
+    "loss_function": "CrossEntropyLoss (Weighted)",
+    "seed": 42,
+    "metodos_evaluados": [
+        "COMBINATION",
+        "TINTO",
+        "DISTANCEMATRIX",
+        "REFINED",
+        "DEEPINSIGHT",
+        "SUPERTML",
+        "FOTOMICS",
+        "FEATUREWRAP",
+        "BARGRAPH",
+        "BIE",
+        "IGTD"
+    ]
+}
