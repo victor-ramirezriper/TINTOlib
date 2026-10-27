@@ -404,13 +404,12 @@ def cargar_baseline(ruta):
     if df.empty:
         return pd.DataFrame()
 
+    # Los experimentos actuales no utilizan SMOTE.
     col_estrategia = buscar_columna(df, ["Estrategia", "Strategy"])
     if col_estrategia is not None:
-        estrategias_disponibles = df[col_estrategia].astype(str).str.strip().str.upper().unique()
-        if "SMOTE" in estrategias_disponibles:
-            df = df[df[col_estrategia].astype(str).str.strip().str.upper() == "SMOTE"].copy()
-        elif "ORIGINAL" in estrategias_disponibles:
-            df = df[df[col_estrategia].astype(str).str.strip().str.upper() == "ORIGINAL"].copy()
+        df = df[df[col_estrategia].astype(str).str.strip().str.upper() != "SMOTE"].copy()
+        if df.empty:
+            return pd.DataFrame()
 
     resultado = pd.DataFrame(index=df.index)
     resultado["Tipo"] = "Baseline"
@@ -788,7 +787,19 @@ def generar_lineas_datasets_ordenadas(df_arch, arquitectura, tabla, output_dir):
             continue
 
         for criterio_col, criterio_nombre in criterios_orden:
-            t_ord = tabla.sort_values(by=criterio_col, ascending=True, na_position="last").reset_index(drop=True)
+            if criterio_col == "Desbalance":
+                # Orden numérico cuando el registro contiene ratios/porcentajes;
+                # si contiene categorías, conservar el orden alfabético.
+                valores = tabla[criterio_col].astype(str).str.strip()
+                numeros = pd.to_numeric(valores.str.replace(",", ".", regex=False).str.rstrip("%"), errors="coerce")
+                if numeros.notna().any():
+                    t_ord = (tabla.assign(_orden_desbalance=numeros)
+                             .sort_values(by="_orden_desbalance", ascending=True, na_position="last")
+                             .drop(columns="_orden_desbalance").reset_index(drop=True))
+                else:
+                    t_ord = tabla.sort_values(by=criterio_col, ascending=True, na_position="last").reset_index(drop=True)
+            else:
+                t_ord = tabla.sort_values(by=criterio_col, ascending=True, na_position="last").reset_index(drop=True)
             p = pivot_modelos_datasets(df_arch, col_metrica, t_ord)
             if p.empty:
                 continue
@@ -1006,6 +1017,12 @@ def generar_graficas_comparativas_arquitecturas(df_global, generales_dir):
         return
 
     dir_gen = asegurar_directorio(Path(generales_dir) / "Comparativa_Arquitecturas")
+
+    # Mostrar cada baseline por separado en lugar de agruparlos como "Tabular".
+    df_global = df_global.copy()
+    df_global.loc[df_global["Arquitectura"] == "Tabular", "Arquitectura"] = df_global.loc[
+        df_global["Arquitectura"] == "Tabular", "Modelo"
+    ]
     
     # 1. Rendimiento promedio (Incluye Tabular / Baselines y Deep Learning)
     resumen_metricas = df_global.groupby("Arquitectura")[["Accuracy_pct", "F1_Score_pct", "ROC_AUC_pct"]].mean().reset_index()
@@ -1142,9 +1159,12 @@ def generar_graficas_globales(df_global, generales_dir, mapeo_bases):
 
     for arquitectura in arquitecturas:
         df_arch = df_global[df_global["Arquitectura"] == arquitectura]
-        extra = df_global[(df_global["Arquitectura"] == "Tabular") & (~df_global["Dataset"].isin(df_arch["Dataset"]))]
-        if arquitectura != "Tabular" and not extra.empty:
-            df_arch = pd.concat([df_arch, extra], ignore_index=True)
+        # Incluir los tres baselines individualmente para los mismos datasets.
+        if arquitectura != "Tabular":
+            baselines = df_global[(df_global["Arquitectura"] == "Tabular") &
+                                  (df_global["Dataset"].isin(df_arch["Dataset"]))]
+            if not baselines.empty:
+                df_arch = pd.concat([df_arch, baselines], ignore_index=True)
 
         carpeta = asegurar_directorio(base / limpiar_nombre_archivo(arquitectura))
         print(f"\n[Global] Arquitectura: {arquitectura}")
