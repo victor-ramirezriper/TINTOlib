@@ -18,7 +18,6 @@ def menu_interactivo_evaluacion():
         print("\nNo se encontró la carpeta de Experimentos en Image/")
         exit()
 
-    # Filtrar solo lotes que correspondan a gran escala o listar todos
     lotes = sorted([d.name for d in carpeta_experimentos.iterdir() if d.is_dir()])
     if not lotes:
         print("\nNo hay lotes de experimentos disponibles.")
@@ -32,8 +31,6 @@ def menu_interactivo_evaluacion():
     lote_seleccionado = lotes[opcion_lote]
     ruta_lote = carpeta_experimentos / lote_seleccionado
 
-    # Buscar las carpetas de métodos TRAIN dentro del lote
-    # (Pueden estar directamente o dentro de una subcarpeta 'Imagenes')
     ruta_imagenes = ruta_lote / "Imagenes" if (ruta_lote / "Imagenes").exists() else ruta_lote
     
     metodos_train = sorted([
@@ -85,7 +82,7 @@ if __name__ == "__main__":
     # Instanciar el manager de deep learning
     manager = DeepLearningPipelineManager(
         red_seleccionada=red_seleccionada,
-        epochs=10,         # Puedes ajustar las épocas aquí si lo deseas
+        epochs=10,         
         batch_size=32,
         lr=0.001
     )
@@ -96,8 +93,15 @@ if __name__ == "__main__":
     for metodo in metodos_a_evaluar:
         try:
             print(f"\n--- Evaluando método: {metodo.upper()} ---")
+            
+            # Llamada directa al manager que ya retorna el diccionario completo con tiempos y métricas
             res = manager.entrenar_holdout_gran_escala(ruta_imagenes, metodo)
-            resultados_totales.append(res)
+            
+            if isinstance(res, dict):
+                resultados_totales.append(res)
+            else:
+                print(f"[!] Advertencia: El método {metodo} no devolvió un diccionario válido.")
+                
         except Exception as e:
             metodos_fallidos.append(metodo)
             print(f"[!] Error crítico evaluando {metodo}: {e}")
@@ -118,6 +122,7 @@ if __name__ == "__main__":
         print(f"Resultados guardados en: {ruta_csv}")
         print("=" * 60)
         print(df_resumen.to_string(index=False))
+        
     if metodos_fallidos:
         print(f"[!] Métodos fallidos: {', '.join(metodos_fallidos)}")
     if not resultados_totales:
